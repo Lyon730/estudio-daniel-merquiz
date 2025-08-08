@@ -1,43 +1,52 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estudio Daniel Merquiz</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="script.js" defer></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Estudio Daniel Merquiz</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="script.js" defer></script>
 </head>
 <body>
-    <header>
-        <h1>Estudio Daniel Merquiz</h1>
-        <nav>
-            <ul>
-                <li><a href="#inicio">Inicio</a></li>
-                <li><a href="#servicios">Servicios</a></li>
-                <li><a href="#precios">Precios</a></li>
-                <li><a href="#reservas">Reservas</a></li>
-                <li><a href="#contacto">Contacto</a></li>
-                <li><a href="#galeria">Galería</a></li>
-            </ul>
-        </nav>
-    </header>
-    <main>
-        <section id="inicio"><h2>Bienvenidos</h2><p>Tu estilo comienza aquí.</p></section>
-        <section id="servicios"><h2>Servicios</h2><p>Cortes, afeitados y más.</p></section>
-        <section id="precios"><h2>Precios</h2><p>Consulta nuestras tarifas.</p></section>
-        <section id="reservas">
-            <h2>Reservas</h2>
-            <form>
-                <input type="text" placeholder="Tu nombre" required>
-                <input type="tel" placeholder="Tu teléfono" required>
-                <input type="datetime-local" required>
-                <button type="submit">Reservar</button>
-            </form>
-            <a class="whatsapp-button" href="https://wa.me/56975571344" target="_blank">Agendar por WhatsApp</a>
-        </section>
-        <section id="contacto"><h2>Contacto</h2><p>Ubícanos en redes o visítanos en el local.</p></section>
-        <section id="galeria"><h2>Galería</h2><p>Próximamente fotos de nuestros estilos.</p></section>
-    </main>
-    <footer><p>&copy; 2025 Estudio Daniel Merquiz</p></footer>
+  <header class="hero">
+    <video class="hero-video" autoplay muted loop playsinline poster="assets/hero-poster.jpg">
+      <source src="assets/video/hero.mp4" type="video/mp4" />
+      <source src="assets/video/hero.webm" type="video/webm" />
+      <!-- Si el navegador no soporta video, se mostrará el poster -->
+    </video>
+    <div class="hero-overlay">
+      <h1>Estudio Daniel Merquiz</h1>
+      <nav>
+        <ul>
+          <li><a href="#inicio">Inicio</a></li>
+          <li><a href="#servicios">Servicios</a></li>
+          <li><a href="#precios">Precios</a></li>
+          <li><a href="#reservas">Reservas</a></li>
+          <li><a href="#contacto">Contacto</a></li>
+          <li><a href="#galeria">Galería</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section id="inicio"><h2>Bienvenidos</h2><p>Tu estilo comienza aquí.</p></section>
+    <section id="servicios"><h2>Servicios</h2><p>Cortes, afeitados y más.</p></section>
+    <section id="precios"><h2>Precios</h2><p>Consulta nuestras tarifas.</p></section>
+    <section id="reservas">
+      <h2>Reservas</h2>
+      <form id="form-reserva">
+        <input type="text" id="nombre" placeholder="Tu nombre" required>
+        <input type="tel" id="telefono" placeholder="Tu teléfono" required>
+        <input type="datetime-local" id="fecha" required>
+        <button type="submit">Reservar</button>
+      </form>
+      <a class="whatsapp-button" id="wa-btn" href="https://wa.me/56912345678" target="_blank" rel="noopener">Agendar por WhatsApp</a>
+    </section>
+    <section id="contacto"><h2>Contacto</h2><p>Ubícanos en redes o visítanos en el local.</p></section>
+    <section id="galeria"><h2>Galería</h2><p>Próximamente fotos de nuestros estilos.</p></section>
+  </main>
+
+  <footer><p>&copy; 2025 Estudio Daniel Merquiz</p></footer>
 </body>
 </html>

@@ -64,7 +64,8 @@ body {
   justify-content: flex-end;
   gap: 1rem;
   text-align: center;
-  padding: 1rem 1rem 3rem 1rem;
+  padding: 2rem 1rem 3rem 1rem;
+  overflow: visible;
 }
 
 .hero-overlay h1 {
@@ -72,35 +73,46 @@ body {
   font-weight: 400;
   font-size: clamp(2.5rem, 7vw, 5rem);
   margin: 0 0 2rem 0;
+  padding: 0.5rem 0;
   color: #f5f5dc;
   text-shadow: 
-    0 0 30px rgba(245, 245, 220, 0.6),
+    0 0 30px rgba(245, 245, 220, 0.8),
     0 6px 12px rgba(0, 0, 0, 0.9),
     0 3px 6px rgba(0, 0, 0, 1),
     0 12px 24px rgba(0, 0, 0, 0.8);
   letter-spacing: 0.02em;
   text-transform: none;
-  line-height: 1.1;
+  line-height: 1.3;
   position: relative;
+  overflow: visible;
+}
+
+.hero-overlay h1::after {
+  content: 'Estudio Daniel Merquiz';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   background: linear-gradient(
     90deg,
-    #f5f5dc 0%,
-    #f5f5dc 30%,
-    #ffffff 50%,
-    #f5f5dc 70%,
-    #f5f5dc 100%
+    transparent 0%,
+    transparent 30%,
+    rgba(255, 255, 255, 0.8) 50%,
+    transparent 70%,
+    transparent 100%
   );
-  background-size: 300% 100%;
+  background-size: 200% 100%;
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   animation: shine 3s ease-in-out infinite;
+  pointer-events: none;
 }
 
 @keyframes shine {
-  0% { background-position: 300% 0; }
-  50% { background-position: -100% 0; }
-  100% { background-position: 300% 0; }
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
 .hero-overlay nav ul {
@@ -202,15 +214,16 @@ body {
   }
   
   .hero-overlay {
-    padding: 1rem 1rem 2rem 1rem;
+    padding: 2rem 1rem 2rem 1rem;
   }
   
   .hero-overlay h1 {
     font-size: clamp(2rem, 9vw, 3.5rem);
     margin-bottom: 1.5rem;
-    line-height: 1.2;
+    line-height: 1.4;
+    padding: 0.8rem 0;
     text-shadow: 
-      0 0 25px rgba(245, 245, 220, 0.5),
+      0 0 25px rgba(245, 245, 220, 0.8),
       0 4px 8px rgba(0, 0, 0, 0.9),
       0 2px 4px rgba(0, 0, 0, 1),
       0 8px 16px rgba(0, 0, 0, 0.7);

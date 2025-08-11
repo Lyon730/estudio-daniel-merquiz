@@ -281,11 +281,24 @@ button {
 }
 
 /* ===== Sección de Contacto ===== */
+.locations-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3rem;
+  margin-top: 2rem;
+}
+
+.location-item {
+  background: rgba(46, 46, 46, 0.3);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid rgba(245, 245, 220, 0.1);
+}
+
 .contact-info {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 2rem;
-  margin-top: 1.5rem;
   align-items: start;
 }
 
@@ -294,7 +307,7 @@ button {
   font-family: 'Montserrat', sans-serif;
   font-weight: 600;
   margin-bottom: 1rem;
-  font-size: 1.2rem;
+  font-size: 1.3rem;
 }
 
 .contact-details p {
@@ -315,8 +328,12 @@ button {
   display: block;
 }
 
-/* Responsive para móviles */
-@media (max-width: 768px) {
+/* Responsive para tablets y móviles */
+@media (max-width: 992px) {
+  .locations-container {
+    gap: 2rem;
+  }
+  
   .contact-info {
     grid-template-columns: 1fr;
     gap: 1.5rem;
@@ -324,6 +341,16 @@ button {
   
   .map-container iframe {
     height: 250px;
+  }
+}
+
+@media (max-width: 768px) {
+  .location-item {
+    padding: 1rem;
+  }
+  
+  .locations-container {
+    gap: 1.5rem;
   }
 }
 

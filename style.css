@@ -33,20 +33,22 @@ body {
   position: absolute;
   top: 1.5rem;
   right: 1.5rem;
-  z-index: 10;
-  width: clamp(80px, 12vw, 150px);
+  z-index: 999;
+  width: 120px;
   height: auto;
+  background: rgba(255, 0, 0, 0.2); /* Debug: fondo rojo temporal para ver el contenedor */
+  border: 1px dashed white; /* Debug: borde para ver el contenedor */
 }
 
 .hero-logo img {
   width: 100%;
   height: auto;
-  border-radius: 8px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-  transition: transform 0.3s ease;
   display: block;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(5px);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.8);
+  transition: transform 0.3s ease;
+  opacity: 1;
 }
 
 .hero-logo img:hover {

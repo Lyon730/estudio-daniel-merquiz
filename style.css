@@ -87,6 +87,35 @@ body {
 
 @media (max-width: 768px) {
   .hero { height: 52vh; min-height: 320px; }
+  
+  .hero-overlay {
+    justify-content: flex-end;
+    padding-bottom: 2rem;
+  }
+  
+  .hero-overlay h1 {
+    font-size: clamp(1.8rem, 8vw, 2.8rem);
+    margin-bottom: 0.5rem;
+  }
+  
+  .hero-overlay nav {
+    width: 100%;
+    margin-top: auto;
+  }
+  
+  .hero-overlay nav ul {
+    justify-content: center;
+    gap: clamp(0.8rem, 4vw, 1.5rem);
+    padding: 0 1rem;
+  }
+  
+  .hero-overlay nav a {
+    font-size: clamp(0.85rem, 3.5vw, 1rem);
+    padding: 0.3rem 0.6rem;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 4px;
+    backdrop-filter: blur(4px);
+  }
 }
 
 /* ===== Secciones base ===== */

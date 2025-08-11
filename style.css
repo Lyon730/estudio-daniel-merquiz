@@ -1,7 +1,10 @@
+/* Importar fuentes elegantes de Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Montserrat:wght@300;400;600;700&display=swap');
+
 /* Paleta: negro (#1c1c1c), plomo (#2e2e2e), crema (#f5f5dc) */
 * { box-sizing: border-box; }
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Montserrat', Arial, Helvetica, sans-serif;
   background-color: #1c1c1c;
   color: #f5f5dc;
   margin: 0;
@@ -39,9 +42,17 @@ body {
 }
 
 .hero-overlay h1 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-weight: 900;
   font-size: clamp(2rem, 6vw, 4rem);
   margin: 0.25rem 0 1rem;
   color: #f5f5dc;
+  text-shadow: 
+    0 0 20px rgba(245, 245, 220, 0.3),
+    0 4px 8px rgba(0, 0, 0, 0.8),
+    0 2px 4px rgba(0, 0, 0, 0.9);
+  letter-spacing: 0.02em;
+  text-transform: none;
 }
 
 .hero-overlay nav ul {
@@ -56,7 +67,17 @@ body {
 .hero-overlay nav a {
   color: #f5f5dc;
   text-decoration: none;
-  font-weight: 700;
+  font-weight: 600;
+  font-family: 'Montserrat', sans-serif;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+  transition: all 0.3s ease;
+}
+
+.hero-overlay nav a:hover {
+  color: #fff;
+  text-shadow: 
+    0 0 10px rgba(245, 245, 220, 0.5),
+    0 2px 4px rgba(0, 0, 0, 0.8);
 }
 
 @media (prefers-reduced-motion: reduce) {

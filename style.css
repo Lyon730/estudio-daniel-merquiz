@@ -80,6 +80,55 @@ body {
     0 2px 4px rgba(0, 0, 0, 0.8);
 }
 
+/* Menú sticky cuando se hace scroll */
+.sticky-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 1000;
+  background: rgba(28, 28, 28, 0.95);
+  backdrop-filter: blur(15px);
+  border-bottom: 1px solid rgba(245, 245, 220, 0.2);
+  padding: 1rem 0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  transform: translateY(-100%);
+  transition: transform 0.3s ease;
+}
+
+.sticky-nav.show {
+  transform: translateY(0);
+}
+
+.sticky-nav ul {
+  display: flex;
+  justify-content: center;
+  gap: clamp(1rem, 4vw, 2.5rem);
+  list-style: none;
+  padding: 0 2rem;
+  margin: 0;
+  flex-wrap: wrap;
+}
+
+.sticky-nav a {
+  color: #f5f5dc;
+  text-decoration: none;
+  font-weight: 600;
+  font-family: 'Montserrat', sans-serif;
+  padding: 0.5rem 1rem;
+  background: rgba(245, 245, 220, 0.1);
+  border-radius: 6px;
+  border: 1px solid rgba(245, 245, 220, 0.2);
+  transition: all 0.3s ease;
+}
+
+.sticky-nav a:hover {
+  background: rgba(245, 245, 220, 0.2);
+  border-color: rgba(245, 245, 220, 0.4);
+  color: #fff;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hero-video { display: none; }
   .hero { background: #2e2e2e url("assets/hero-poster.jpg") center/cover no-repeat; }
@@ -88,51 +137,19 @@ body {
 @media (max-width: 768px) {
   .hero { height: 52vh; min-height: 320px; }
   
-  .hero-overlay {
-    justify-content: center;
-    padding-bottom: 4rem; /* Espacio para el menú fijo */
-  }
-  
   .hero-overlay h1 {
     font-size: clamp(1.8rem, 8vw, 2.8rem);
-    margin-bottom: 0.5rem;
+    margin-bottom: 1rem;
   }
   
-  .hero-overlay nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    width: 100%;
-    z-index: 100;
-    background: rgba(28, 28, 28, 0.95);
-    backdrop-filter: blur(10px);
-    border-top: 1px solid rgba(245, 245, 220, 0.2);
-    padding: 0.8rem 0;
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
-  }
-  
-  .hero-overlay nav ul {
-    justify-content: center;
-    gap: clamp(0.5rem, 3vw, 1.2rem);
+  .sticky-nav ul {
+    gap: clamp(0.8rem, 4vw, 1.5rem);
     padding: 0 1rem;
-    margin: 0;
   }
   
-  .hero-overlay nav a {
-    font-size: clamp(0.75rem, 3vw, 0.9rem);
+  .sticky-nav a {
+    font-size: clamp(0.8rem, 3.5vw, 0.95rem);
     padding: 0.4rem 0.8rem;
-    background: rgba(245, 245, 220, 0.1);
-    border-radius: 6px;
-    border: 1px solid rgba(245, 245, 220, 0.3);
-    transition: all 0.3s ease;
-  }
-  
-  .hero-overlay nav a:hover,
-  .hero-overlay nav a:active {
-    background: rgba(245, 245, 220, 0.2);
-    border-color: rgba(245, 245, 220, 0.5);
-    transform: translateY(-2px);
   }
 }
 
@@ -140,13 +157,6 @@ body {
 section {
   padding: 2rem;
   border-bottom: 1px solid #444;
-}
-
-/* Compensar el menú fijo en móviles */
-@media (max-width: 768px) {
-  main {
-    padding-bottom: 4rem; /* Espacio para el menú fijo */
-  }
 }
 
 nav ul {

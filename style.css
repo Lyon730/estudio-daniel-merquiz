@@ -33,7 +33,7 @@ body {
   position: absolute;
   top: 1.5rem;
   right: 1.5rem;
-  z-index: 2;
+  z-index: 10;
   width: clamp(80px, 12vw, 150px);
   height: auto;
 }
@@ -42,8 +42,11 @@ body {
   width: 100%;
   height: auto;
   border-radius: 8px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
   transition: transform 0.3s ease;
+  display: block;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
 }
 
 .hero-logo img:hover {

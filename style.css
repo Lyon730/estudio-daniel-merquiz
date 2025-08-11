@@ -280,6 +280,53 @@ button {
   border-radius: 6px;
 }
 
+/* ===== Sección de Contacto ===== */
+.contact-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-top: 1.5rem;
+  align-items: start;
+}
+
+.contact-details h3 {
+  color: #f5f5dc;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+}
+
+.contact-details p {
+  margin-bottom: 0.8rem;
+  line-height: 1.6;
+}
+
+.map-container {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(245, 245, 220, 0.2);
+}
+
+.map-container iframe {
+  width: 100%;
+  height: 300px;
+  display: block;
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+  .contact-info {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .map-container iframe {
+    height: 250px;
+  }
+}
+
 footer {
   background-color: #2e2e2e;
   text-align: center;

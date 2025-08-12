@@ -3,10 +3,23 @@ document.getElementById("form-reserva").addEventListener("submit", function (e) 
   e.preventDefault();
   const nombre = document.getElementById("nombre").value.trim();
   const telefono = document.getElementById("telefono").value.trim();
-  const fecha = document.getElementById("fecha").value;
+  const fechaReserva = document.getElementById("fecha-reserva").value;
+  const horaSeleccionada = document.getElementById("hora-seleccionada").value;
 
-  const fechaFmt = fecha ? new Date(fecha).toLocaleString() : "";
-  const mensaje = `Hola, soy ${nombre}. Quiero reservar para el ${fechaFmt}. Mi teléfono: ${telefono}.`;
+  if (!horaSeleccionada) {
+    alert("Por favor selecciona una hora disponible.");
+    return;
+  }
+
+  const fecha = new Date(fechaReserva + 'T00:00:00');
+  const fechaFmt = fecha.toLocaleDateString('es-ES', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+  
+  const mensaje = `Hola, soy ${nombre}. Quiero reservar para el ${fechaFmt} a las ${horaSeleccionada}. Mi teléfono: ${telefono}.`;
   const wa = document.getElementById("wa-btn");
   const base = wa.getAttribute("href").split("?")[0];
   wa.setAttribute("href", base + `?text=${encodeURIComponent(mensaje)}`);
@@ -557,4 +570,151 @@ function mostrarTodasLasReservas() {
   document.getElementById('fecha-filtro').value = '';
   mostrarReservasDisponibles();
 }
+
+// ===== FUNCIONES PARA RESERVAS EN PANTALLA PRINCIPAL =====
+
+// Función para mostrar horas disponibles cuando se selecciona una fecha en la pantalla principal
+function mostrarHorasDisponibles() {
+  const fechaInput = document.getElementById('fecha-reserva');
+  const container = document.getElementById('horas-disponibles-container');
+  const gridContainer = document.getElementById('horas-disponibles-grid');
+  const btnReservar = document.getElementById('btn-reservar');
+  const horaSeleccionadaInput = document.getElementById('hora-seleccionada');
+  
+  if (!fechaInput.value) {
+    container.style.display = 'none';
+    btnReservar.disabled = true;
+    return;
+  }
+  
+  const fechaSeleccionada = new Date(fechaInput.value + 'T00:00:00');
+  const año = fechaSeleccionada.getFullYear();
+  const mes = fechaSeleccionada.getMonth() + 1;
+  const dia = fechaSeleccionada.getDate();
+  const claveFecha = `${año}-${mes}-${dia}`;
+  
+  // Verificar si hay horarios configurados para esta fecha
+  const horarios = horariosGuardados[claveFecha];
+  
+  if (!horarios) {
+    container.style.display = 'block';
+    gridContainer.innerHTML = `
+      <div class="no-horas-disponibles">
+        <p>📅 No hay horarios disponibles para esta fecha.</p>
+        <p>Por favor selecciona otra fecha o contacta al barbero directamente.</p>
+      </div>
+    `;
+    btnReservar.disabled = true;
+    horaSeleccionadaInput.value = '';
+    return;
+  }
+  
+  // Generar las horas disponibles
+  let horasHTML = '';
+  
+  // Turno mañana
+  if (horarios.mañana.inicio && horarios.mañana.fin) {
+    const slotsMañana = generarSlotsParaCliente(horarios.mañana, claveFecha);
+    if (slotsMañana.length > 0) {
+      horasHTML += `
+        <div class="turno-section-cliente">
+          <div class="turno-titulo-cliente">🌅 Turno Mañana</div>
+          <div class="horas-grid">
+            ${slotsMañana.map(slot => `
+              <div class="hora-slot ${slot.ocupado ? 'ocupado' : ''}" 
+                   onclick="${slot.ocupado ? '' : `seleccionarHora('${slot.hora}')`}">
+                ${slot.hora}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+  }
+  
+  // Turno tarde
+  if (horarios.tarde.inicio && horarios.tarde.fin) {
+    const slotsTarde = generarSlotsParaCliente(horarios.tarde, claveFecha);
+    if (slotsTarde.length > 0) {
+      horasHTML += `
+        <div class="turno-section-cliente">
+          <div class="turno-titulo-cliente">🌆 Turno Tarde</div>
+          <div class="horas-grid">
+            ${slotsTarde.map(slot => `
+              <div class="hora-slot ${slot.ocupado ? 'ocupado' : ''}" 
+                   onclick="${slot.ocupado ? '' : `seleccionarHora('${slot.hora}')`}">
+                ${slot.hora}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+  }
+  
+  if (!horasHTML) {
+    horasHTML = `
+      <div class="no-horas-disponibles">
+        <p>😔 No hay citas disponibles para esta fecha.</p>
+        <p>Todas las horas están ocupadas. Prueba con otra fecha.</p>
+      </div>
+    `;
+  }
+  
+  gridContainer.innerHTML = horasHTML;
+  container.style.display = 'block';
+  
+  // Limpiar selección anterior
+  horaSeleccionadaInput.value = '';
+  btnReservar.disabled = true;
+}
+
+// Función para generar slots de horario para clientes
+function generarSlotsParaCliente(turno, claveFecha) {
+  const slots = [];
+  const inicio = convertirHoraAMinutos(turno.inicio);
+  const fin = convertirHoraAMinutos(turno.fin);
+  
+  for (let minutos = inicio; minutos < fin; minutos += 30) {
+    const horaStr = convertirMinutosAHora(minutos);
+    const claveSlot = `${claveFecha}-${horaStr}`;
+    const ocupado = reservasOcupadas[claveSlot] || false;
+    
+    slots.push({
+      hora: horaStr,
+      ocupado: ocupado
+    });
+  }
+  
+  return slots;
+}
+
+// Función para seleccionar una hora específica
+function seleccionarHora(hora) {
+  // Remover selección anterior
+  document.querySelectorAll('.hora-slot').forEach(slot => {
+    slot.classList.remove('selected');
+  });
+  
+  // Seleccionar la nueva hora
+  const slotSeleccionado = Array.from(document.querySelectorAll('.hora-slot'))
+    .find(slot => slot.textContent.trim() === hora);
+  
+  if (slotSeleccionado) {
+    slotSeleccionado.classList.add('selected');
+    document.getElementById('hora-seleccionada').value = hora;
+    document.getElementById('btn-reservar').disabled = false;
+  }
+}
+
+// Validar que no se puedan seleccionar fechas pasadas
+document.addEventListener('DOMContentLoaded', function() {
+  const fechaInput = document.getElementById('fecha-reserva');
+  if (fechaInput) {
+    // Establecer fecha mínima como hoy
+    const hoy = new Date();
+    const fechaMinima = hoy.toISOString().split('T')[0];
+    fechaInput.setAttribute('min', fechaMinima);
+  }
+});
 // --- FIN INICIO DE SESIÓN ADMIN ---

@@ -57,8 +57,18 @@
       <form id="form-reserva">
         <input type="text" id="nombre" placeholder="Tu nombre" required>
         <input type="tel" id="telefono" placeholder="Tu teléfono" required>
-        <input type="datetime-local" id="fecha" required>
-        <button type="submit">Reservar</button>
+        <input type="date" id="fecha-reserva" placeholder="Selecciona una fecha" required onchange="mostrarHorasDisponibles()">
+        
+        <!-- Container para mostrar las horas disponibles -->
+        <div id="horas-disponibles-container" style="display:none;">
+          <h3>Horarios Disponibles</h3>
+          <div id="horas-disponibles-grid" class="horas-grid">
+            <!-- Las horas se mostrarán aquí dinámicamente -->
+          </div>
+          <input type="hidden" id="hora-seleccionada" required>
+        </div>
+        
+        <button type="submit" id="btn-reservar" disabled>Reservar</button>
       </form>
       <a class="whatsapp-button" id="wa-btn" href="https://wa.me/56996774738" target="_blank" rel="noopener">Agendar por WhatsApp</a>
     </section>

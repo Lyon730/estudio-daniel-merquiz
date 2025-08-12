@@ -270,6 +270,119 @@ button {
   cursor: pointer;
 }
 
+button:disabled {
+  background-color: #666;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ===== Horas Disponibles en Reservas ===== */
+#horas-disponibles-container {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(46, 46, 46, 0.3);
+  border-radius: 8px;
+  border: 1px solid rgba(245, 245, 220, 0.2);
+}
+
+#horas-disponibles-container h3 {
+  color: #f5f5dc;
+  margin-bottom: 1rem;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  text-align: center;
+}
+
+.horas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.hora-slot {
+  padding: 0.8rem 0.5rem;
+  background: #2e2e2e;
+  color: #f5f5dc;
+  border: 2px solid rgba(245, 245, 220, 0.3);
+  border-radius: 6px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.hora-slot:hover {
+  background: #444;
+  border-color: #f5f5dc;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.hora-slot.selected {
+  background: #25D366;
+  border-color: #25D366;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
+}
+
+.hora-slot.ocupado {
+  background: #666;
+  color: #999;
+  cursor: not-allowed;
+  border-color: #555;
+}
+
+.hora-slot.ocupado:hover {
+  background: #666;
+  border-color: #555;
+  transform: none;
+  box-shadow: none;
+}
+
+.no-horas-disponibles {
+  text-align: center;
+  padding: 2rem;
+  color: #999;
+}
+
+.no-horas-disponibles p {
+  margin: 0.5rem 0;
+  font-size: 0.95rem;
+}
+
+.turno-section-cliente {
+  margin-bottom: 1.5rem;
+}
+
+.turno-titulo-cliente {
+  font-weight: 600;
+  color: #f5f5dc;
+  margin-bottom: 0.8rem;
+  font-size: 1rem;
+  padding-left: 0.5rem;
+  border-left: 3px solid #25D366;
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+  .horas-grid {
+    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+    gap: 0.6rem;
+  }
+  
+  .hora-slot {
+    padding: 0.6rem 0.3rem;
+    font-size: 0.85rem;
+  }
+  
+  #horas-disponibles-container {
+    padding: 0.8rem;
+  }
+}
+
 .whatsapp-button {
   display: inline-block;
   margin-top: 1rem;

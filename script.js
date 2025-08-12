@@ -153,6 +153,11 @@ function showAdminTab(tabName) {
   if (tabName === 'horas-tab') {
     inicializarCalendario();
   }
+  
+  // Si se selecciona la pestaña de reservas, mostrar las reservas disponibles
+  if (tabName === 'reservas-tab') {
+    mostrarReservasDisponibles();
+  }
 }
 
 // ===== SISTEMA DE CALENDARIO PARA HORARIOS =====
@@ -346,5 +351,210 @@ if (document.getElementById('horarios-form')) {
 // Cerrar modal al hacer clic en la X
 if (document.getElementById('close-horarios')) {
   document.getElementById('close-horarios').addEventListener('click', cerrarModalHorarios);
+}
+
+// ===== SISTEMA DE GESTIÓN DE RESERVAS =====
+let reservasOcupadas = {}; // Almacenará las reservas ocupadas por fecha y hora
+
+// Función para mostrar todas las reservas disponibles
+function mostrarReservasDisponibles() {
+  const container = document.getElementById('dias-disponibles');
+  if (!container) return;
+  
+  // Verificar si hay horarios configurados
+  if (Object.keys(horariosGuardados).length === 0) {
+    container.innerHTML = `
+      <div class="no-horarios">
+        <p>📅 No hay horarios configurados aún.</p>
+        <p>Ve a la pestaña "Gestionar Horas de Atención" para configurar los horarios de trabajo.</p>
+      </div>
+    `;
+    return;
+  }
+  
+  let html = '';
+  const fechasOrdenadas = Object.keys(horariosGuardados).sort();
+  
+  fechasOrdenadas.forEach(claveFecha => {
+    const horarios = horariosGuardados[claveFecha];
+    const [año, mes, dia] = claveFecha.split('-').map(Number);
+    const fecha = new Date(año, mes - 1, dia);
+    
+    // Solo mostrar fechas futuras o actual
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    
+    if (fecha >= hoy) {
+      html += generarDiaReservas(fecha, horarios, claveFecha);
+    }
+  });
+  
+  if (html === '') {
+    html = `
+      <div class="no-horarios">
+        <p>📅 No hay horarios disponibles para fechas futuras.</p>
+        <p>Configura horarios para fechas próximas en "Gestionar Horas de Atención".</p>
+      </div>
+    `;
+  }
+  
+  container.innerHTML = html;
+}
+
+// Función para generar los slots de un día específico
+function generarDiaReservas(fecha, horarios, claveFecha) {
+  const fechaStr = fecha.toLocaleDateString('es-ES', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+  
+  const turnoMañana = generarSlotsHorarios(horarios.mañana, claveFecha, 'mañana');
+  const turnoTarde = generarSlotsHorarios(horarios.tarde, claveFecha, 'tarde');
+  
+  const totalSlots = turnoMañana.slots.length + turnoTarde.slots.length;
+  const slotsOcupados = turnoMañana.ocupados + turnoTarde.ocupados;
+  const slotsDisponibles = totalSlots - slotsOcupados;
+  
+  return `
+    <div class="dia-disponible">
+      <div class="dia-header">
+        <div class="dia-fecha">${fechaStr}</div>
+        <div class="dia-estado">${slotsDisponibles} citas disponibles</div>
+      </div>
+      
+      <div class="turnos-container">
+        ${turnoMañana.html}
+        ${turnoTarde.html}
+      </div>
+    </div>
+  `;
+}
+
+// Función para generar slots de horarios cada 30 minutos
+function generarSlotsHorarios(turno, claveFecha, tipoTurno) {
+  if (!turno.inicio || !turno.fin) {
+    return {
+      html: `
+        <div class="turno-seccion">
+          <div class="turno-titulo">
+            ${tipoTurno === 'mañana' ? '🌅 Turno Mañana' : '🌆 Turno Tarde'}
+          </div>
+          <div class="no-turnos">Sin horarios configurados</div>
+        </div>
+      `,
+      slots: [],
+      ocupados: 0
+    };
+  }
+  
+  const slots = [];
+  const inicio = convertirHoraAMinutos(turno.inicio);
+  const fin = convertirHoraAMinutos(turno.fin);
+  
+  for (let minutos = inicio; minutos < fin; minutos += 30) {
+    const horaStr = convertirMinutosAHora(minutos);
+    const claveSlot = `${claveFecha}-${horaStr}`;
+    const ocupado = reservasOcupadas[claveSlot] || false;
+    
+    slots.push({
+      hora: horaStr,
+      ocupado: ocupado,
+      clave: claveSlot
+    });
+  }
+  
+  const ocupados = slots.filter(slot => slot.ocupado).length;
+  
+  const slotsHtml = slots.map(slot => `
+    <div class="horario-slot ${slot.ocupado ? 'ocupado' : ''}" 
+         onclick="${slot.ocupado ? '' : `reservarCita('${slot.clave}', '${slot.hora}')`}">
+      ${slot.hora}
+      ${slot.ocupado ? '<br><small>Ocupado</small>' : ''}
+    </div>
+  `).join('');
+  
+  return {
+    html: `
+      <div class="turno-seccion">
+        <div class="turno-titulo">
+          ${tipoTurno === 'mañana' ? '🌅 Turno Mañana' : '🌆 Turno Tarde'}
+          <small>(${slots.length - ocupados}/${slots.length} disponibles)</small>
+        </div>
+        <div class="horarios-grid">
+          ${slotsHtml}
+        </div>
+      </div>
+    `,
+    slots: slots,
+    ocupados: ocupados
+  };
+}
+
+// Función para convertir hora (HH:MM) a minutos
+function convertirHoraAMinutos(hora) {
+  const [horas, minutos] = hora.split(':').map(Number);
+  return horas * 60 + minutos;
+}
+
+// Función para convertir minutos a hora (HH:MM)
+function convertirMinutosAHora(minutos) {
+  const horas = Math.floor(minutos / 60);
+  const mins = minutos % 60;
+  return `${horas.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+}
+
+// Función para reservar una cita (placeholder por ahora)
+function reservarCita(claveSlot, hora) {
+  const confirmacion = confirm(`¿Confirmar reserva para las ${hora}?`);
+  if (confirmacion) {
+    // Marcar como ocupado
+    reservasOcupadas[claveSlot] = true;
+    
+    // Actualizar la vista
+    mostrarReservasDisponibles();
+    
+    alert(`Cita reservada exitosamente para las ${hora}`);
+  }
+}
+
+// Función para filtrar reservas por fecha
+function filtrarReservasPorFecha() {
+  const fechaFiltro = document.getElementById('fecha-filtro').value;
+  if (!fechaFiltro) {
+    mostrarTodasLasReservas();
+    return;
+  }
+  
+  const container = document.getElementById('dias-disponibles');
+  if (!container) return;
+  
+  const fecha = new Date(fechaFiltro + 'T00:00:00');
+  const año = fecha.getFullYear();
+  const mes = fecha.getMonth() + 1;
+  const dia = fecha.getDate();
+  const claveFecha = `${año}-${mes}-${dia}`;
+  
+  const horarios = horariosGuardados[claveFecha];
+  
+  if (!horarios) {
+    container.innerHTML = `
+      <div class="no-horarios">
+        <p>📅 No hay horarios configurados para esta fecha.</p>
+        <p>Selecciona otra fecha o configura horarios en "Gestionar Horas de Atención".</p>
+      </div>
+    `;
+    return;
+  }
+  
+  const html = generarDiaReservas(fecha, horarios, claveFecha);
+  container.innerHTML = html;
+}
+
+// Función para mostrar todas las reservas
+function mostrarTodasLasReservas() {
+  document.getElementById('fecha-filtro').value = '';
+  mostrarReservasDisponibles();
 }
 // --- FIN INICIO DE SESIÓN ADMIN ---

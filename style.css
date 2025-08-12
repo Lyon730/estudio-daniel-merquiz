@@ -773,3 +773,183 @@ footer {
     right: 2px;
   }
 }
+
+/* ===== GESTIÓN DE RESERVAS ===== */
+.reservas-controls {
+  background: rgba(245, 245, 220, 0.1);
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  border: 1px solid rgba(245, 245, 220, 0.2);
+}
+
+.date-filter {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.date-filter label {
+  color: #f5f5dc;
+  font-weight: 600;
+}
+
+.date-filter input[type="date"] {
+  padding: 0.5rem;
+  border: 1px solid rgba(245, 245, 220, 0.3);
+  border-radius: 4px;
+  background: rgba(245, 245, 220, 0.05);
+  color: #f5f5dc;
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+  background: #5a6268;
+  transform: translateY(-1px);
+}
+
+.dias-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.dia-disponible {
+  background: rgba(245, 245, 220, 0.08);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid rgba(245, 245, 220, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dia-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid rgba(245, 245, 220, 0.2);
+}
+
+.dia-fecha {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #f5f5dc;
+}
+
+.dia-estado {
+  font-size: 0.9rem;
+  color: #28a745;
+  font-weight: 600;
+}
+
+.turnos-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.turno-seccion {
+  background: rgba(245, 245, 220, 0.05);
+  border-radius: 8px;
+  padding: 1rem;
+  border: 1px solid rgba(245, 245, 220, 0.1);
+}
+
+.turno-titulo {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #f5f5dc;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.horarios-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 0.5rem;
+}
+
+.horario-slot {
+  background: rgba(245, 245, 220, 0.1);
+  border: 1px solid rgba(245, 245, 220, 0.2);
+  border-radius: 6px;
+  padding: 0.5rem;
+  text-align: center;
+  color: #f5f5dc;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.horario-slot:hover {
+  background: rgba(245, 245, 220, 0.2);
+  transform: translateY(-1px);
+}
+
+.horario-slot.ocupado {
+  background: rgba(220, 53, 69, 0.2);
+  border-color: rgba(220, 53, 69, 0.4);
+  color: #dc3545;
+  cursor: not-allowed;
+}
+
+.horario-slot.ocupado:hover {
+  transform: none;
+}
+
+.no-horarios {
+  text-align: center;
+  padding: 3rem;
+  background: rgba(245, 245, 220, 0.05);
+  border-radius: 12px;
+  border: 2px dashed rgba(245, 245, 220, 0.2);
+}
+
+.no-horarios p {
+  color: #f5f5dc;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+.no-turnos {
+  text-align: center;
+  padding: 1rem;
+  color: #888;
+  font-style: italic;
+}
+
+/* Responsive para reservas */
+@media (max-width: 768px) {
+  .date-filter {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .turnos-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .horarios-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  }
+  
+  .dia-header {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+}

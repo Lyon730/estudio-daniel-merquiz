@@ -184,9 +184,23 @@
       <!-- Pestaña Reservas -->
       <div id="reservas-tab" class="admin-tab-content" style="display:none;">
         <h2>Gestionar Reservas</h2>
-        <p>Aquí podrás ver y administrar todas las reservas del estudio.</p>
-        <div class="coming-soon">
-          <p>📅 Funcionalidad en desarrollo...</p>
+        <p>Aquí puedes ver todas las citas disponibles según los horarios configurados.</p>
+        
+        <!-- Filtros y controles -->
+        <div class="reservas-controls">
+          <div class="date-filter">
+            <label for="fecha-filtro">Filtrar por fecha:</label>
+            <input type="date" id="fecha-filtro" onchange="filtrarReservasPorFecha()">
+            <button onclick="mostrarTodasLasReservas()" class="btn-secondary">Mostrar Todas</button>
+          </div>
+        </div>
+        
+        <!-- Lista de días con horarios disponibles -->
+        <div id="dias-disponibles" class="dias-container">
+          <div class="no-horarios">
+            <p>📅 No hay horarios configurados aún.</p>
+            <p>Ve a la pestaña "Gestionar Horas de Atención" para configurar los horarios de trabajo.</p>
+          </div>
         </div>
       </div>
       

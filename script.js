@@ -139,16 +139,24 @@ function showAdminPanel() {
   }
   const raf = () => new Promise(r => requestAnimationFrame(r));
   (async () => {
-    // Esperar a que el panel se pinte realmente (2 frames)
+    // Esperar a que el panel se pinte (2 frames)
     await raf();
     await raf();
-    await inicializarDatos();
+    // Render inmediato del calendario (no bloquear por Firebase)
+    console.log('🗓️ Render inmediato calendario (antes de datos)');
     inicializarCalendario();
+    // Cargar datos en paralelo y luego refrescar
+    inicializarDatos()
+      .then(() => {
+        console.log('✅ Datos listos (async), refrescando calendario');
+        mostrarCalendario(fechaActual.getFullYear(), fechaActual.getMonth());
+      })
+      .catch(err => console.error('❌ Error inicializarDatos async:', err));
     // Fallback: si no se generó ningún día, reintentar
     setTimeout(() => {
       if (!document.querySelector('#calendar-days .calendar-day')) {
         console.log('♻️ Re-render calendario (fallback)');
-        inicializarCalendario();
+        mostrarCalendario(fechaActual.getFullYear(), fechaActual.getMonth());
       }
     }, 300);
   })();

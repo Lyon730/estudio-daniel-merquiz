@@ -617,6 +617,16 @@ footer {
   background: rgba(245, 245, 220, 0.2);
   border-radius: 8px;
   overflow: hidden;
+  margin-bottom: 1px;
+}
+
+.calendar-days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+  background: rgba(245, 245, 220, 0.2);
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 .day-header {

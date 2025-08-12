@@ -173,7 +173,10 @@ function mostrarCalendario(año, mes) {
   const primerDia = new Date(año, mes, 1);
   const ultimoDia = new Date(año, mes + 1, 0);
   const diasEnMes = ultimoDia.getDate();
-  const diaSemanaPrimero = primerDia.getDay(); // 0 = Domingo
+  
+  // Ajustar para que la semana comience en Lunes (0=Lunes, 6=Domingo)
+  let diaSemanaPrimero = primerDia.getDay(); // 0 = Domingo en JavaScript
+  diaSemanaPrimero = diaSemanaPrimero === 0 ? 6 : diaSemanaPrimero - 1; // Convertir para que Lunes = 0
   
   // Obtener fecha actual para comparación
   const hoy = new Date();

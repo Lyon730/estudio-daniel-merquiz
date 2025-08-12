@@ -613,13 +613,13 @@ function generarSlotsHorarios(turno, claveFecha, tipoTurno) {
   
   const ocupados = slots.filter(slot => slot.ocupado).length;
   
-  const slotsHtml = slots.map(slot => `
-    <div class="horario-slot ${slot.ocupado ? 'ocupado' : ''}" 
-         onclick="${slot.ocupado ? '' : `reservarCita('${slot.clave}', '${slot.hora}')`}">
-      ${slot.hora}
-      ${slot.ocupado ? '<br><small>Ocupado</small>' : ''}
-    </div>
-  `).join('');
+  const slotsHtml = slots.map(slot => {
+    if (slot.ocupado) {
+      return `<div class="horario-slot ocupado">${slot.hora}<br><small>Ocupado${slot.ocupado.nombre ? ' ('+slot.ocupado.nombre+')' : ''}</small><br><button type="button" class="liberar-btn" onclick="liberarCita('${slot.clave}')" style="margin-top:4px;font-size:10px;padding:2px 6px;background:#dc3545;color:#fff;border:none;border-radius:4px;cursor:pointer;">Liberar</button></div>`;
+    } else {
+      return `<div class="horario-slot" onclick="reservarCita('${slot.clave}', '${slot.hora}')">${slot.hora}</div>`;
+    }
+  }).join('');
   
   return {
     html: `
@@ -662,15 +662,22 @@ async function reservarCita(claveSlot, hora) {
       tipo: 'admin',
       confirmada: true
     };
-    
-    // Guardar en Firebase
     await guardarReservasEnFirebase();
-    
-    // Actualizar la vista
     mostrarReservasDisponibles();
-    
     alert(`Cita reservada exitosamente para las ${hora}`);
   }
+}
+
+// Nueva función: liberar una cita ocupada
+async function liberarCita(claveSlot) {
+  if (!reservasOcupadas[claveSlot]) return;
+  const hora = claveSlot.split('-').slice(-1)[0];
+  const confirmar = confirm(`¿Liberar la hora ${hora}?`);
+  if (!confirmar) return;
+  delete reservasOcupadas[claveSlot];
+  await guardarReservasEnFirebase();
+  mostrarReservasDisponibles();
+  alert(`Hora ${hora} liberada`);
 }
 
 // Función para filtrar reservas por fecha

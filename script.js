@@ -473,61 +473,6 @@ function cerrarModalHorarios() {
   document.getElementById('horarios-modal').style.display = 'none';
 }
 
-// Manejar el envío del formulario de horarios
-if (document.getElementById('horarios-form')) {
-  document.getElementById('horarios-form').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    
-    const fecha = window.fechaSeleccionadaActual;
-    if (!fecha) return;
-    
-    // Obtener los valores del formulario
-    const mananaInicio = document.getElementById('manana-inicio').value;
-    const mananaFin = document.getElementById('manana-fin').value;
-    const tardeInicio = document.getElementById('tarde-inicio').value;
-    const tardeFin = document.getElementById('tarde-fin').value;
-    
-    // Validar que al menos un turno esté completo
-    const tieneManana = mananaInicio && mananaFin;
-    const tieneTarde = tardeInicio && tardeFin;
-    
-    if (!tieneManana && !tieneTarde) {
-      alert('Debe configurar al menos un turno completo (mañana o tarde)');
-      return;
-    }
-    
-    // Guardar los horarios
-    const claveFecha = `${fecha.getFullYear()}-${fecha.getMonth() + 1}-${fecha.getDate()}`;
-    horariosGuardados[claveFecha] = {
-      mañana: {
-        inicio: mananaInicio,
-        fin: mananaFin
-      },
-      tarde: {
-        inicio: tardeInicio,
-        fin: tardeFin
-      }
-    };
-    
-    // Guardar en Firebase
-    await guardarHorariosEnFirebase();
-    
-    // Actualizar el calendario para mostrar que tiene horarios
-    mostrarCalendario(fechaActual.getFullYear(), fechaActual.getMonth());
-    
-    // Cerrar el modal
-    cerrarModalHorarios();
-    
-    // Mostrar confirmación
-    alert('Horarios guardados exitosamente para ' + fecha.toLocaleDateString('es-ES'));
-  });
-}
-
-// Cerrar modal al hacer clic en la X
-if (document.getElementById('close-horarios')) {
-  document.getElementById('close-horarios').addEventListener('click', cerrarModalHorarios);
-}
-
 // ===== SISTEMA DE GESTIÓN DE RESERVAS =====
 
 // Función para mostrar todas las reservas disponibles
@@ -922,6 +867,80 @@ document.addEventListener('DOMContentLoaded', async function() {
         document.getElementById("login-error").style.display = "block";
       }
     });
+  }
+
+  // === CONFIGURAR EVENTOS DEL FORMULARIO DE HORARIOS ===
+  const horariosForm = document.getElementById('horarios-form');
+  const closeHorarios = document.getElementById('close-horarios');
+
+  if (horariosForm) {
+    horariosForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      console.log('📅 Formulario de horarios enviado');
+      
+      const fecha = window.fechaSeleccionadaActual;
+      if (!fecha) {
+        alert('No se ha seleccionado una fecha válida');
+        return;
+      }
+      
+      // Obtener los valores del formulario
+      const mananaInicio = document.getElementById('manana-inicio').value;
+      const mananaFin = document.getElementById('manana-fin').value;
+      const tardeInicio = document.getElementById('tarde-inicio').value;
+      const tardeFin = document.getElementById('tarde-fin').value;
+      
+      // Validar que al menos un turno esté completo
+      const tieneManana = mananaInicio && mananaFin;
+      const tieneTarde = tardeInicio && tardeFin;
+      
+      if (!tieneManana && !tieneTarde) {
+        alert('Debe configurar al menos un turno completo (mañana o tarde)');
+        return;
+      }
+      
+      // Guardar los horarios
+      const claveFecha = `${fecha.getFullYear()}-${fecha.getMonth() + 1}-${fecha.getDate()}`;
+      horariosGuardados[claveFecha] = {
+        mañana: {
+          inicio: mananaInicio,
+          fin: mananaFin
+        },
+        tarde: {
+          inicio: tardeInicio,
+          fin: tardeFin
+        }
+      };
+      
+      console.log('💾 Guardando horarios:', horariosGuardados[claveFecha]);
+      
+      // Guardar en Firebase
+      try {
+        await guardarHorariosEnFirebase();
+        console.log('✅ Horarios guardados en Firebase exitosamente');
+      } catch (error) {
+        console.error('❌ Error al guardar en Firebase:', error);
+        alert('Error al guardar los horarios. Inténtalo de nuevo.');
+        return;
+      }
+      
+      // Actualizar el calendario para mostrar que tiene horarios
+      mostrarCalendario(fechaActual.getFullYear(), fechaActual.getMonth());
+      
+      // Cerrar el modal
+      cerrarModalHorarios();
+      
+      // Mostrar confirmación
+      alert('Horarios guardados exitosamente para ' + fecha.toLocaleDateString('es-ES'));
+    });
+    console.log('✅ Evento del formulario de horarios configurado');
+  } else {
+    console.error('❌ No se encontró el formulario de horarios');
+  }
+
+  if (closeHorarios) {
+    closeHorarios.addEventListener('click', cerrarModalHorarios);
+    console.log('✅ Evento de cerrar modal horarios configurado');
   }
   
   // === INICIALIZAR DATOS Y CONFIGURACIÓN ===

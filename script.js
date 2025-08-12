@@ -935,13 +935,20 @@ document.addEventListener('DOMContentLoaded', async function() {
         return;
       }
       
-      // Actualizar el calendario para mostrar que tiene horarios
-      console.log('🔄 Actualizando calendario...');
-      mostrarCalendario(fechaActual.getFullYear(), fechaActual.getMonth());
+      // Cerrar el modal INMEDIATAMENTE después del guardado
+      console.log('🚪 Cerrando modal inmediatamente después del guardado...');
+      const modal = document.getElementById('horarios-modal');
+      if (modal) {
+        modal.style.display = 'none';
+        console.log('✅ Modal cerrado exitosamente');
+      }
       
-      // Cerrar el modal ANTES del alert
-      console.log('🚪 Cerrando modal antes del alert...');
-      cerrarModalHorarios();
+      // Actualizar el calendario en segundo plano
+      console.log('🔄 Actualizando calendario en segundo plano...');
+      setTimeout(() => {
+        mostrarCalendario(fechaActual.getFullYear(), fechaActual.getMonth());
+        console.log('� Calendario actualizado');
+      }, 100);
       
       // Mostrar confirmación después de cerrar el modal
       setTimeout(() => {

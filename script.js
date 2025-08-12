@@ -97,6 +97,12 @@ function showAdminPanel() {
   if (adminPanel) {
     adminPanel.style.display = 'block';
   }
+  
+  // Inicializar el calendario después de que el panel sea visible
+  // Usar setTimeout para asegurar que el DOM esté completamente renderizado
+  setTimeout(() => {
+    inicializarCalendario();
+  }, 100);
 }
 
 // Función para cerrar sesión de admin
@@ -154,6 +160,18 @@ let fechaActual = new Date();
 let horariosGuardados = {}; // Almacenará los horarios por fecha
 
 function inicializarCalendario() {
+  // Verificar que los elementos del DOM estén disponibles
+  const calendarDays = document.getElementById('calendar-days');
+  const monthYearElement = document.getElementById('current-month-year');
+  
+  if (!calendarDays || !monthYearElement) {
+    // Si los elementos no están disponibles, intentar de nuevo después de un breve delay
+    setTimeout(() => {
+      inicializarCalendario();
+    }, 50);
+    return;
+  }
+  
   mostrarCalendario(fechaActual.getFullYear(), fechaActual.getMonth());
 }
 

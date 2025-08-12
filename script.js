@@ -3,7 +3,6 @@
 const firebaseConfig = {
   apiKey: "AIzaSyCqix70kqE3MPh_lwz0uolGECT1MerteUU",
   authDomain: "estudio-daniel-merquiz.firebaseapp.com",
-  databaseURL: "https://estudio-daniel-merquiz-default-rtdb.firebaseio.com",
   projectId: "estudio-daniel-merquiz",
   storageBucket: "estudio-daniel-merquiz.firebasestorage.app",
   messagingSenderId: "876381250367",
@@ -202,142 +201,13 @@ function showAdminTab(tabName) {
   }
 }
 
-// ===== SISTEMA DE CALENDARIO PARA HORARIOS =====
+// === VARIABLES GLOBALES (declaradas temprano para evitar TDZ) ===
 let fechaActual = new Date();
-let horariosGuardados = {}; // Almacenará los horarios por fecha
-let reservasOcupadas = {}; // Almacenará las reservas ocupadas por fecha y hora
+let horariosGuardados = {}; // horarios por fecha
+let reservasOcupadas = {}; // reservas por slot
+console.log('[INIT] Variables globales declaradas.');
 
-// ===== FUNCIONES DE FIREBASE =====
-
-// Función para cargar horarios desde Firebase
-async function cargarHorariosDesdeFirebase() {
-  if (!database) {
-    console.log('Firebase no disponible, usando datos locales');
-    return;
-  }
-  
-  try {
-    const snapshot = await database.ref('horarios').once('value');
-    const horarios = snapshot.val();
-    
-    if (horarios) {
-      horariosGuardados = horarios;
-      console.log('✅ Horarios cargados desde Firebase:', horarios);
-      
-      // Actualizar el calendario si está visible
-      if (document.getElementById('calendar-days')) {
-        mostrarCalendario(fechaActual.getFullYear(), fechaActual.getMonth());
-      }
-    }
-  } catch (error) {
-    console.error('❌ Error al cargar horarios desde Firebase:', error);
-  }
-}
-
-// Función para guardar horarios en Firebase
-async function guardarHorariosEnFirebase() {
-  if (!database) {
-    console.log('Firebase no disponible, guardando solo localmente');
-    return false;
-  }
-  try {
-    console.log('⏫ Enviando horarios a Firebase...', horariosGuardados);
-    await database.ref('horarios').set(horariosGuardados);
-    console.log('✅ Horarios guardados en Firebase');
-    return true;
-  } catch (error) {
-    console.error('❌ Error al guardar horarios en Firebase:', error);
-    return false;
-  }
-}
-
-// Función para cargar reservas desde Firebase
-async function cargarReservasDesdeFirebase() {
-  if (!database) {
-    console.log('Firebase no disponible, usando datos locales');
-    return;
-  }
-  
-  try {
-    const snapshot = await database.ref('reservas').once('value');
-    const reservas = snapshot.val();
-    
-    if (reservas) {
-      reservasOcupadas = reservas;
-      console.log('✅ Reservas cargadas desde Firebase:', reservas);
-    }
-  } catch (error) {
-    console.error('❌ Error al cargar reservas desde Firebase:', error);
-  }
-}
-
-// Función para guardar reservas en Firebase
-async function guardarReservasEnFirebase() {
-  if (!database) {
-    console.log('Firebase no disponible, guardando solo localmente');
-    return;
-  }
-  
-  try {
-    await database.ref('reservas').set(reservasOcupadas);
-    console.log('✅ Reservas guardadas en Firebase');
-  } catch (error) {
-    console.error('❌ Error al guardar reservas en Firebase:', error);
-  }
-}
-
-// Función para limpiar datos antiguos automáticamente
-async function limpiarDatosAntiguos() {
-  const hoy = new Date();
-  hoy.setHours(0, 0, 0, 0);
-  
-  let huboLimpieza = false;
-  
-  // Limpiar horarios de fechas pasadas
-  Object.keys(horariosGuardados).forEach(claveFecha => {
-    const [año, mes, dia] = claveFecha.split('-').map(Number);
-    const fecha = new Date(año, mes - 1, dia);
-    
-    if (fecha < hoy) {
-      delete horariosGuardados[claveFecha];
-      huboLimpieza = true;
-    }
-  });
-  
-  // Limpiar reservas de fechas pasadas
-  Object.keys(reservasOcupadas).forEach(claveReserva => {
-    const fechaParte = claveReserva.split('-').slice(0, 3).join('-');
-    const [año, mes, dia] = fechaParte.split('-').map(Number);
-    const fecha = new Date(año, mes - 1, dia);
-    
-    if (fecha < hoy) {
-      delete reservasOcupadas[claveReserva];
-      huboLimpieza = true;
-    }
-  });
-  
-  // Guardar los datos limpios si hubo cambios
-  if (huboLimpieza) {
-    console.log('🧹 Limpiando datos antiguos...');
-    await guardarHorariosEnFirebase();
-    await guardarReservasEnFirebase();
-  }
-}
-
-// Función para inicializar datos al cargar la página
-async function inicializarDatos() {
-  console.log('🚀 Inicializando datos...');
-  
-  // Cargar datos desde Firebase
-  await cargarHorariosDesdeFirebase();
-  await cargarReservasDesdeFirebase();
-  
-  // Limpiar datos antiguos
-  await limpiarDatosAntiguos();
-  
-  console.log('✅ Datos inicializados correctamente');
-}
-
+// ===== SISTEMA DE CALENDARIO PARA HORARIOS =====
 function inicializarCalendario() {
   // Verificar que los elementos del DOM estén disponibles
   const calendarDays = document.getElementById('calendar-days');
@@ -506,17 +376,17 @@ if (document.getElementById('horarios-form')) {
     let guardadoOk = false;
     try {
       guardadoOk = await guardarHorariosEnFirebase();
+      if (guardadoOk) {
+        // Releer de Firebase para confirmar persistencia
+        await cargarHorariosDesdeFirebase();
+        console.log('🔄 Relectura tras guardado completada.');
+      }
     } catch (err) {
       console.error('❌ Excepción al guardar en Firebase:', err);
     } finally {
-      // Refrescar calendario siempre
       mostrarCalendario(fechaActual.getFullYear(), fechaActual.getMonth());
     }
-    if (guardadoOk) {
-      alert('Horarios guardados exitosamente para ' + fecha.toLocaleDateString('es-ES'));
-    } else {
-      alert('Horarios guardados localmente. (No se pudo guardar en Firebase ahora)');
-    }
+    alert(guardadoOk ? ('Horarios guardados exitosamente para ' + fecha.toLocaleDateString('es-ES')) : 'Horarios guardados localmente. (No se pudo guardar en Firebase ahora)');
   });
 }
 

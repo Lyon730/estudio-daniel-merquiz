@@ -133,18 +133,25 @@ function showAdminPanel() {
   document.querySelector('main').style.display = 'none';
   document.querySelector('footer').style.display = 'none';
   document.querySelector('.sticky-nav').style.display = 'none';
-  
-  // Mostrar el panel de administración
   const adminPanel = document.getElementById('admin-panel');
   if (adminPanel) {
     adminPanel.style.display = 'block';
   }
-  
-  // Inicializar datos y calendario después de que el panel sea visible
-  setTimeout(async () => {
+  const raf = () => new Promise(r => requestAnimationFrame(r));
+  (async () => {
+    // Esperar a que el panel se pinte realmente (2 frames)
+    await raf();
+    await raf();
     await inicializarDatos();
     inicializarCalendario();
-  }, 100);
+    // Fallback: si no se generó ningún día, reintentar
+    setTimeout(() => {
+      if (!document.querySelector('#calendar-days .calendar-day')) {
+        console.log('♻️ Re-render calendario (fallback)');
+        inicializarCalendario();
+      }
+    }, 300);
+  })();
 }
 
 // Función para cerrar sesión de admin

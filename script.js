@@ -942,11 +942,19 @@ document.addEventListener('DOMContentLoaded', async function() {
       // Mostrar confirmación antes de cerrar el modal
       alert('Horarios guardados exitosamente para ' + fecha.toLocaleDateString('es-ES'));
       
-      // Cerrar el modal después de la confirmación
-      console.log('🚪 Cerrando modal después del guardado...');
+      // Cerrar el modal inmediatamente después de la confirmación
+      console.log('🚪 Cerrando modal inmediatamente...');
+      cerrarModalHorarios();
+      
+      // Verificación adicional por si falla el primer intento
       setTimeout(() => {
-        cerrarModalHorarios();
-      }, 100);
+        console.log('🔍 Verificando si el modal se cerró...');
+        const modal = document.getElementById('horarios-modal');
+        if (modal && modal.style.display !== 'none') {
+          console.log('⚠️ Modal aún visible, forzando cierre...');
+          modal.style.display = 'none';
+        }
+      }, 200);
     });
     console.log('✅ Evento del formulario de horarios configurado');
   } else {

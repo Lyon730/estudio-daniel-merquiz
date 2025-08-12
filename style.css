@@ -563,3 +563,159 @@ footer {
     font-size: 1.5rem;
   }
 }
+
+/* ===== CALENDARIO DE HORARIOS ===== */
+.calendar-container {
+  max-width: 800px;
+  margin: 0 auto;
+  background: rgba(245, 245, 220, 0.1);
+  border-radius: 12px;
+  padding: 2rem;
+  border: 1px solid rgba(245, 245, 220, 0.2);
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.calendar-header button {
+  background: #f5f5dc;
+  color: #1c1c1c;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.calendar-header button:hover {
+  background: #e8e8c0;
+  transform: scale(1.1);
+}
+
+.calendar-header h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  color: #f5f5dc;
+  margin: 0;
+  text-align: center;
+  min-width: 200px;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+  background: rgba(245, 245, 220, 0.2);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.day-header {
+  background: #2e2e2e;
+  color: #f5f5dc;
+  padding: 1rem;
+  text-align: center;
+  font-weight: bold;
+  font-size: 0.9rem;
+  border: 1px solid rgba(245, 245, 220, 0.1);
+}
+
+.calendar-day {
+  background: rgba(245, 245, 220, 0.05);
+  padding: 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(245, 245, 220, 0.1);
+  color: #f5f5dc;
+  font-weight: 600;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.calendar-day:hover {
+  background: rgba(245, 245, 220, 0.15);
+  transform: scale(1.05);
+}
+
+.calendar-day.active {
+  background: #f5f5dc;
+  color: #1c1c1c;
+  font-weight: bold;
+}
+
+.calendar-day.active:hover {
+  background: #e8e8c0;
+}
+
+.calendar-day.disabled {
+  background: rgba(245, 245, 220, 0.02);
+  color: #666;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.calendar-day.disabled:hover {
+  transform: none;
+  background: rgba(245, 245, 220, 0.02);
+}
+
+.calendar-day.other-month {
+  color: #888;
+  opacity: 0.3;
+}
+
+.calendar-day.has-schedule {
+  border: 2px solid #28a745;
+}
+
+.calendar-day.has-schedule::after {
+  content: '✓';
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  color: #28a745;
+  font-weight: bold;
+  font-size: 0.8rem;
+}
+
+/* Responsive para el calendario */
+@media (max-width: 768px) {
+  .calendar-container {
+    padding: 1rem;
+  }
+  
+  .calendar-header h3 {
+    font-size: 1.2rem;
+    min-width: 150px;
+  }
+  
+  .calendar-header button {
+    width: 35px;
+    height: 35px;
+    font-size: 1.2rem;
+  }
+  
+  .day-header {
+    padding: 0.5rem;
+    font-size: 0.8rem;
+  }
+  
+  .calendar-day {
+    padding: 0.5rem;
+    min-height: 45px;
+    font-size: 0.9rem;
+  }
+}

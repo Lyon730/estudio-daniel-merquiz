@@ -174,17 +174,30 @@ function logoutAdmin() {
   document.querySelector('main').style.display = 'block';
   document.querySelector('footer').style.display = 'block';
   document.querySelector('.sticky-nav').style.display = 'block';
-  
   // Ocultar el panel de administración
   const adminPanel = document.getElementById('admin-panel');
   if (adminPanel) {
     adminPanel.style.display = 'none';
   }
-  
   // Limpiar formulario de login
   document.getElementById("admin-user").value = '';
   document.getElementById("admin-pass").value = '';
   document.getElementById("login-error").style.display = "none";
+  // NUEVO: limpiar formulario de reservas de la vista cliente
+  const nombreInput = document.getElementById('nombre');
+  const telefonoInput = document.getElementById('telefono');
+  const fechaReservaInput = document.getElementById('fecha-reserva');
+  const horaSelInput = document.getElementById('hora-seleccionada');
+  const gridHoras = document.getElementById('horas-disponibles-grid');
+  const contHoras = document.getElementById('horas-disponibles-container');
+  const btnReservar = document.getElementById('btn-reservar');
+  if (nombreInput) nombreInput.value = '';
+  if (telefonoInput) telefonoInput.value = '';
+  if (fechaReservaInput) fechaReservaInput.value = '';
+  if (horaSelInput) horaSelInput.value = '';
+  if (gridHoras) gridHoras.innerHTML = '';
+  if (contHoras) contHoras.style.display = 'none';
+  if (btnReservar) btnReservar.disabled = true;
 }
 
 // Función para cambiar pestañas en el panel de admin
@@ -634,9 +647,11 @@ function generarSlotsHorarios(turno, claveFecha, tipoTurno) {
   
   const slotsHtml = slots.map(slot => {
     if (slot.ocupado) {
-      return `<div class="horario-slot ocupado">${slot.hora}<br><small>Ocupado${slot.ocupado.nombre ? ' ('+slot.ocupado.nombre+')' : ''}</small><br><button type="button" class="liberar-btn" onclick="liberarCita('${slot.clave}')" style="margin-top:4px;font-size:10px;padding:2px 6px;background:#dc3545;color:#fff;border:none;border-radius:4px;cursor:pointer;">Liberar</button></div>`;
+      const nombre = slot.ocupado.nombre ? slot.ocupado.nombre : (slot.ocupado.tipo === 'admin' ? 'Admin' : '');
+      const telefono = slot.ocupado.telefono ? slot.ocupado.telefono : '';
+      return `<div class="horario-slot ocupado">${slot.hora}<br><small>Ocupado${nombre ? ' ('+nombre+')' : ''}${telefono ? '<br>'+telefono : ''}</small><br><button type=\"button\" class=\"liberar-btn\" onclick=\"liberarCita('${slot.clave}')\" style=\"margin-top:4px;font-size:10px;padding:2px 6px;background:#dc3545;color:#fff;border:none;border-radius:4px;cursor:pointer;\">Liberar</button></div>`;
     } else {
-      return `<div class="horario-slot" onclick="reservarCita('${slot.clave}', '${slot.hora}')">${slot.hora}</div>`;
+      return `<div class=\"horario-slot\" onclick=\"reservarCita('${slot.clave}', '${slot.hora}')\">${slot.hora}</div>`;
     }
   }).join('');
   

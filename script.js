@@ -150,6 +150,11 @@ function showAdminPanel() {
       .then(() => {
         console.log('✅ Datos listos (async), refrescando calendario');
         mostrarCalendario(fechaActual.getFullYear(), fechaActual.getMonth());
+        // Si reservas tab activo tras carga, refrescar
+        const reservasTab = document.getElementById('reservas-tab');
+        if (reservasTab && reservasTab.style.display !== 'none') {
+          mostrarReservasDisponibles();
+        }
       })
       .catch(err => console.error('❌ Error inicializarDatos async:', err));
     // Fallback: si no se generó ningún día, reintentar
@@ -213,7 +218,14 @@ function showAdminTab(tabName) {
   
   // Si se selecciona la pestaña de reservas, mostrar las reservas disponibles
   if (tabName === 'reservas-tab') {
-    mostrarReservasDisponibles();
+    if (!datosListos) {
+      const cont = document.getElementById('dias-disponibles');
+      if (cont) {
+        cont.innerHTML = '<div class="no-horarios"><p>⏳ Cargando datos...</p></div>';
+      }
+    } else {
+      mostrarReservasDisponibles();
+    }
   }
 }
 
@@ -221,6 +233,7 @@ function showAdminTab(tabName) {
 let fechaActual = new Date();
 let horariosGuardados = {}; // horarios por fecha
 let reservasOcupadas = {}; // reservas por slot
+let datosListos = false; // nuevo flag
 console.log('[INIT] Variables globales declaradas.');
 
 // ===== FUNCIONES FIREBASE (añadidas) =====
@@ -297,7 +310,13 @@ async function inicializarDatos() {
   await cargarHorariosDesdeFirebase();
   await cargarReservasDesdeFirebase();
   await limpiarDatosAntiguos();
+  datosListos = true; // marcar listo
   console.log('✅ Datos listos');
+  // Si el tab de reservas está visible en este momento, refrescar
+  const reservasTab = document.getElementById('reservas-tab');
+  if (reservasTab && reservasTab.style.display !== 'none') {
+    mostrarReservasDisponibles();
+  }
 }
 
 // ===== SISTEMA DE CALENDARIO PARA HORARIOS =====

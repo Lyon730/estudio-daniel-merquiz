@@ -53,3 +53,35 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     }
   });
 });
+
+// --- INICIO DE SESIÓN ADMIN ---
+// Mostrar modal al hacer clic en el logo
+if (document.getElementById("login-logo")) {
+  document.getElementById("login-logo").addEventListener("click", () => {
+    document.getElementById("login-modal").style.display = "flex";
+  });
+}
+// Cerrar modal
+if (document.getElementById("close-login")) {
+  document.getElementById("close-login").addEventListener("click", () => {
+    document.getElementById("login-modal").style.display = "none";
+    document.getElementById("login-error").style.display = "none";
+  });
+}
+// Validar usuario administrador
+if (document.getElementById("admin-login-form")) {
+  document.getElementById("admin-login-form").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const user = document.getElementById("admin-user").value.trim();
+    const pass = document.getElementById("admin-pass").value.trim();
+    // Usuario y contraseña de ejemplo
+    if (user === "admin" && pass === "1234") {
+      alert("Bienvenido administrador");
+      document.getElementById("login-modal").style.display = "none";
+      // Aquí puedes redirigir o mostrar opciones de admin
+    } else {
+      document.getElementById("login-error").style.display = "block";
+    }
+  });
+}
+// --- FIN INICIO DE SESIÓN ADMIN ---

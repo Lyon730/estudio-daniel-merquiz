@@ -346,6 +346,8 @@ function mostrarCalendario(año, mes) {
     const diaElement = document.createElement('div');
     diaElement.className = 'calendar-day';
     diaElement.textContent = dia;
+    const claveDate = `${año}-${mes + 1}-${dia}`; // clave sin padding
+    diaElement.dataset.date = claveDate; // guardar clave para selección directa
     
     // Verificar si es una fecha pasada
     if (fechaDia < hoy) {
@@ -357,7 +359,6 @@ function mostrarCalendario(año, mes) {
     }
     
     // Verificar si ya tiene horarios guardados
-    const claveDate = `${año}-${mes + 1}-${dia}`;
     if (horariosGuardados[claveDate]) {
       diaElement.classList.add('has-schedule');
     }
@@ -455,7 +456,6 @@ if (document.getElementById('horarios-form')) {
     try {
       guardadoOk = await guardarHorariosEnFirebase();
       if (guardadoOk) {
-        // Releer de Firebase para confirmar persistencia
         await cargarHorariosDesdeFirebase();
         console.log('🔄 Relectura tras guardado completada.');
       }
@@ -463,6 +463,7 @@ if (document.getElementById('horarios-form')) {
       console.error('❌ Excepción al guardar en Firebase:', err);
     } finally {
       mostrarCalendario(fechaActual.getFullYear(), fechaActual.getMonth());
+      markSpecificDate(claveFecha); // asegurar marca
     }
     alert(guardadoOk ? ('Horarios guardados exitosamente para ' + fecha.toLocaleDateString('es-ES')) : 'Horarios guardados localmente. (No se pudo guardar en Firebase ahora)');
   });
@@ -471,6 +472,17 @@ if (document.getElementById('horarios-form')) {
 // Cerrar modal al hacer clic en la X
 if (document.getElementById('close-horarios')) {
   document.getElementById('close-horarios').addEventListener('click', cerrarModalHorarios);
+}
+
+// Función para marcar un día específico en el calendario
+function markSpecificDate(claveFecha) {
+  const cell = document.querySelector(`#calendar-days .calendar-day[data-date='${claveFecha}']`);
+  if (cell) {
+    cell.classList.add('has-schedule');
+    console.log('✅ Día marcado manualmente:', claveFecha);
+  } else {
+    console.warn('⚠️ No se encontró la celda para marcar:', claveFecha);
+  }
 }
 
 // ===== SISTEMA DE GESTIÓN DE RESERVAS =====

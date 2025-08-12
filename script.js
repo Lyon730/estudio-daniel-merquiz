@@ -3,6 +3,7 @@
 const firebaseConfig = {
   apiKey: "AIzaSyCqix70kqE3MPh_lwz0uolGECT1MerteUU",
   authDomain: "estudio-daniel-merquiz.firebaseapp.com",
+  databaseURL: "https://estudio-daniel-merquiz-default-rtdb.firebaseio.com", // <-- añadida (faltaba)
   projectId: "estudio-daniel-merquiz",
   storageBucket: "estudio-daniel-merquiz.firebasestorage.app",
   messagingSenderId: "876381250367",
@@ -206,6 +207,83 @@ let fechaActual = new Date();
 let horariosGuardados = {}; // horarios por fecha
 let reservasOcupadas = {}; // reservas por slot
 console.log('[INIT] Variables globales declaradas.');
+
+// ===== FUNCIONES FIREBASE (añadidas) =====
+async function cargarHorariosDesdeFirebase() {
+  if (!database) return;
+  try {
+    const snap = await database.ref('horarios').once('value');
+    const data = snap.val();
+    if (data) {
+      horariosGuardados = data;
+      console.log('✅ (load) Horarios:', Object.keys(horariosGuardados));
+    } else {
+      console.log('ℹ️ (load) No hay horarios en Firebase');
+    }
+  } catch (err) {
+    console.error('❌ cargarHorariosDesdeFirebase:', err);
+  }
+}
+async function guardarHorariosEnFirebase() {
+  if (!database) { console.warn('⚠️ Firebase no inicializado'); return false; }
+  try {
+    await database.ref('horarios').set(horariosGuardados);
+    console.log('✅ (save) Horarios escritos');
+    return true;
+  } catch (err) {
+    console.error('❌ guardarHorariosEnFirebase:', err);
+    return false;
+  }
+}
+async function cargarReservasDesdeFirebase() {
+  if (!database) return;
+  try {
+    const snap = await database.ref('reservas').once('value');
+    const data = snap.val();
+    if (data) {
+      reservasOcupadas = data;
+      console.log('✅ (load) Reservas:', Object.keys(reservasOcupadas).length);
+    }
+  } catch (err) {
+    console.error('❌ cargarReservasDesdeFirebase:', err);
+  }
+}
+async function guardarReservasEnFirebase() {
+  if (!database) { console.warn('⚠️ Firebase no inicializado'); return false; }
+  try {
+    await database.ref('reservas').set(reservasOcupadas);
+    console.log('✅ (save) Reservas escritas');
+    return true;
+  } catch (err) {
+    console.error('❌ guardarReservasEnFirebase:', err);
+    return false;
+  }
+}
+async function limpiarDatosAntiguos() {
+  const hoy = new Date(); hoy.setHours(0,0,0,0);
+  let changed = false;
+  for (const key of Object.keys(horariosGuardados)) {
+    const [a, m, d] = key.split('-').map(Number);
+    if (new Date(a, m-1, d) < hoy) { delete horariosGuardados[key]; changed = true; }
+  }
+  for (const key of Object.keys(reservasOcupadas)) {
+    const parts = key.split('-');
+    const [a, m, d] = parts.slice(0,3).map(Number);
+    if (new Date(a, m-1, d) < hoy) { delete reservasOcupadas[key]; changed = true; }
+  }
+  if (changed) {
+    console.log('🧹 Datos antiguos limpiados');
+    await guardarHorariosEnFirebase();
+    await guardarReservasEnFirebase();
+  }
+}
+async function inicializarDatos() {
+  console.log('🚀 inicializarDatos()');
+  await cargarHorariosDesdeFirebase();
+  await cargarReservasDesdeFirebase();
+  await limpiarDatosAntiguos();
+  console.log('✅ Datos listos');
+}
 
 // ===== SISTEMA DE CALENDARIO PARA HORARIOS =====
 function inicializarCalendario() {

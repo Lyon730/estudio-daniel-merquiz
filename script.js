@@ -1,14 +1,5 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-
 // ===== CONFIGURACIÓN DE FIREBASE =====
-// IMPORTANTE: Reemplaza esta configuración con la tuya desde Firebase Console
+// IMPORTANTE: Configuración de Firebase para tu proyecto
 const firebaseConfig = {
   apiKey: "AIzaSyCqix70kqE3MPh_lwz0uolGECT1MerteUU",
   authDomain: "estudio-daniel-merquiz.firebaseapp.com",
@@ -134,34 +125,6 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 });
 
 // --- INICIO DE SESIÓN ADMIN ---
-// Mostrar modal al hacer clic en el logo
-if (document.getElementById("login-logo")) {
-  document.getElementById("login-logo").addEventListener("click", () => {
-    document.getElementById("login-modal").style.display = "flex";
-  });
-}
-// Cerrar modal
-if (document.getElementById("close-login")) {
-  document.getElementById("close-login").addEventListener("click", () => {
-    document.getElementById("login-modal").style.display = "none";
-    document.getElementById("login-error").style.display = "none";
-  });
-}
-// Validar usuario administrador
-if (document.getElementById("admin-login-form")) {
-  document.getElementById("admin-login-form").addEventListener("submit", function(e) {
-    e.preventDefault();
-    const user = document.getElementById("admin-user").value.trim();
-    const pass = document.getElementById("admin-pass").value.trim();
-    // Usuario y contraseña de ejemplo
-    if (user === "admin" && pass === "1234") {
-      document.getElementById("login-modal").style.display = "none";
-      showAdminPanel();
-    } else {
-      document.getElementById("login-error").style.display = "block";
-    }
-  });
-}
 
 // Función para mostrar el panel de administración
 function showAdminPanel() {
@@ -913,21 +876,66 @@ function seleccionarHora(hora) {
   }
 }
 
-// Validar que no se puedan seleccionar fechas pasadas
+// Validar que no se puedan seleccionar fechas pasadas e inicializar todo
 document.addEventListener('DOMContentLoaded', async function() {
-  console.log('📱 Página cargada, inicializando...');
+  console.log('📱 Página cargada, inicializando sistema completo...');
   
+  // === CONFIGURAR EVENTOS DE LOGIN ===
+  // Mostrar modal al hacer clic en el logo
+  const loginLogo = document.getElementById("login-logo");
+  if (loginLogo) {
+    loginLogo.addEventListener("click", () => {
+      console.log('🔐 Logo clickeado, abriendo modal de login');
+      const modal = document.getElementById("login-modal");
+      if (modal) {
+        modal.style.display = "flex";
+      }
+    });
+    console.log('✅ Evento de login logo configurado');
+  } else {
+    console.error('❌ No se encontró el elemento login-logo');
+  }
+  
+  // Cerrar modal
+  const closeLogin = document.getElementById("close-login");
+  if (closeLogin) {
+    closeLogin.addEventListener("click", () => {
+      const modal = document.getElementById("login-modal");
+      const error = document.getElementById("login-error");
+      if (modal) modal.style.display = "none";
+      if (error) error.style.display = "none";
+    });
+  }
+  
+  // Validar usuario administrador
+  const adminForm = document.getElementById("admin-login-form");
+  if (adminForm) {
+    adminForm.addEventListener("submit", function(e) {
+      e.preventDefault();
+      const user = document.getElementById("admin-user").value.trim();
+      const pass = document.getElementById("admin-pass").value.trim();
+      // Usuario y contraseña de ejemplo
+      if (user === "admin" && pass === "1234") {
+        document.getElementById("login-modal").style.display = "none";
+        showAdminPanel();
+      } else {
+        document.getElementById("login-error").style.display = "block";
+      }
+    });
+  }
+  
+  // === INICIALIZAR DATOS Y CONFIGURACIÓN ===
   // Cargar datos desde Firebase
   await inicializarDatos();
   
+  // Configurar fecha mínima para reservas
   const fechaInput = document.getElementById('fecha-reserva');
   if (fechaInput) {
-    // Establecer fecha mínima como hoy
     const hoy = new Date();
     const fechaMinima = hoy.toISOString().split('T')[0];
     fechaInput.setAttribute('min', fechaMinima);
   }
   
-  console.log('✅ Inicialización completa');
+  console.log('✅ Sistema completo inicializado correctamente');
 });
 // --- FIN INICIO DE SESIÓN ADMIN ---

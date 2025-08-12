@@ -939,22 +939,14 @@ document.addEventListener('DOMContentLoaded', async function() {
       console.log('🔄 Actualizando calendario...');
       mostrarCalendario(fechaActual.getFullYear(), fechaActual.getMonth());
       
-      // Mostrar confirmación antes de cerrar el modal
-      alert('Horarios guardados exitosamente para ' + fecha.toLocaleDateString('es-ES'));
-      
-      // Cerrar el modal inmediatamente después de la confirmación
-      console.log('🚪 Cerrando modal inmediatamente...');
+      // Cerrar el modal ANTES del alert
+      console.log('🚪 Cerrando modal antes del alert...');
       cerrarModalHorarios();
       
-      // Verificación adicional por si falla el primer intento
+      // Mostrar confirmación después de cerrar el modal
       setTimeout(() => {
-        console.log('🔍 Verificando si el modal se cerró...');
-        const modal = document.getElementById('horarios-modal');
-        if (modal && modal.style.display !== 'none') {
-          console.log('⚠️ Modal aún visible, forzando cierre...');
-          modal.style.display = 'none';
-        }
-      }, 200);
+        alert('Horarios guardados exitosamente para ' + fecha.toLocaleDateString('es-ES'));
+      }, 300);
     });
     console.log('✅ Evento del formulario de horarios configurado');
   } else {

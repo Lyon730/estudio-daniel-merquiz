@@ -15,7 +15,7 @@
 </head>
 <body>
   <header class="hero">
-    <video class="hero-video" autoplay muted loop playsinline>
+    <video class="hero-video" autoplay muted loop playsinline poster="assets/hero-poster.jpg">
       <source src="assets/video/hero.mp4" type="video/mp4" />
       <source src="assets/video/hero.webm" type="video/webm" />
       <!-- Si el navegador no soporta video, se mostrará el poster -->
@@ -233,7 +233,7 @@
   <!-- Modal para configurar horarios de trabajo -->
   <div id="horarios-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:10000; justify-content:center; align-items:center;">
     <div style="background:#fff; padding:20px; border-radius:8px; width:90%; max-width:450px; max-height:90vh; overflow-y:auto; position:relative; color:#1c1c1c;">
-      <span onclick="document.getElementById('horarios-modal').style.display='none'" style="position:absolute; top:10px; right:15px; cursor:pointer; font-size:20px; color:#666;">&times;</span>
+      <span id="close-horarios" style="position:absolute; top:10px; right:15px; cursor:pointer; font-size:20px; color:#666;">&times;</span>
       
       <h2 style="color:#1c1c1c; text-align:center; margin-bottom:10px; font-size:1.3rem;">Configurar Horarios</h2>
       <p id="fecha-seleccionada" style="text-align:center; font-weight:bold; color:#2e2e2e; margin-bottom:20px; font-size:0.9rem;"></p>
@@ -278,7 +278,7 @@
         
         <!-- Botones -->
         <div style="display:flex; gap:8px; justify-content:flex-end;">
-          <button type="button" onclick="document.getElementById('horarios-modal').style.display='none'" style="background:#6c757d; color:white; border:none; padding:8px 16px; border-radius:4px; cursor:pointer; font-size:0.9rem;">
+          <button type="button" onclick="cerrarModalHorarios()" style="background:#6c757d; color:white; border:none; padding:8px 16px; border-radius:4px; cursor:pointer; font-size:0.9rem;">
             Cancelar
           </button>
           <button type="submit" style="background:#28a745; color:white; border:none; padding:8px 16px; border-radius:4px; cursor:pointer; font-size:0.9rem;">

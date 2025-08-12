@@ -124,6 +124,25 @@
     <section id="galeria"><h2>Galería</h2><p>Próximamente fotos de nuestros estilos.</p></section>
   </main>
 
+  <!-- Logo a la derecha del video -->
+  <div style="position: absolute; top: 20px; right: 40px; z-index: 10;">
+    <img id="login-logo" src="assets/DanielMerquiz1.png" alt="Logo" style="cursor:pointer; width:60px;">
+  </div>
+
+  <!-- Modal de inicio de sesión -->
+  <div id="login-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center;">
+    <div style="background:#fff; padding:30px; border-radius:8px; min-width:300px; position:relative;">
+      <span id="close-login" style="position:absolute; top:10px; right:15px; cursor:pointer; font-size:20px;">&times;</span>
+      <h2>Iniciar sesión</h2>
+      <form id="admin-login-form">
+        <input type="text" id="admin-user" placeholder="Usuario" required style="width:100%; margin-bottom:10px;">
+        <input type="password" id="admin-pass" placeholder="Contraseña" required style="width:100%; margin-bottom:10px;">
+        <button type="submit" style="width:100%;">Entrar</button>
+      </form>
+      <div id="login-error" style="color:red; margin-top:10px; display:none;">Usuario o contraseña incorrectos</div>
+    </div>
+  </div>
+
   <footer><p>&copy; 2025 Estudio Daniel Merquiz</p></footer>
 </body>
 </html>

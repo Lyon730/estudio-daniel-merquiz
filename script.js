@@ -353,6 +353,8 @@ function inicializarCalendario() {
 }
 
 function mostrarCalendario(año, mes) {
+  console.log(`📅 Mostrando calendario para ${año}/${mes + 1}`);
+  
   const nombresMeses = [
     'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
     'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
@@ -362,6 +364,8 @@ function mostrarCalendario(año, mes) {
   const monthYearElement = document.getElementById('current-month-year');
   if (monthYearElement) {
     monthYearElement.textContent = `${nombresMeses[mes]} ${año}`;
+  } else {
+    console.warn('⚠️ Elemento current-month-year no encontrado');
   }
   
   // Obtener el primer día del mes y cuántos días tiene
@@ -470,7 +474,14 @@ function abrirModalHorarios(fecha) {
 }
 
 function cerrarModalHorarios() {
-  document.getElementById('horarios-modal').style.display = 'none';
+  console.log('🚪 Cerrando modal de horarios...');
+  const modal = document.getElementById('horarios-modal');
+  if (modal) {
+    modal.style.display = 'none';
+    console.log('✅ Modal cerrado exitosamente');
+  } else {
+    console.error('❌ No se encontró el modal horarios-modal');
+  }
 }
 
 // ===== SISTEMA DE GESTIÓN DE RESERVAS =====
@@ -925,13 +936,17 @@ document.addEventListener('DOMContentLoaded', async function() {
       }
       
       // Actualizar el calendario para mostrar que tiene horarios
+      console.log('🔄 Actualizando calendario...');
       mostrarCalendario(fechaActual.getFullYear(), fechaActual.getMonth());
       
-      // Cerrar el modal
-      cerrarModalHorarios();
-      
-      // Mostrar confirmación
+      // Mostrar confirmación antes de cerrar el modal
       alert('Horarios guardados exitosamente para ' + fecha.toLocaleDateString('es-ES'));
+      
+      // Cerrar el modal después de la confirmación
+      console.log('🚪 Cerrando modal después del guardado...');
+      setTimeout(() => {
+        cerrarModalHorarios();
+      }, 100);
     });
     console.log('✅ Evento del formulario de horarios configurado');
   } else {

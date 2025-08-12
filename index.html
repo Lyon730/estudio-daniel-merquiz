@@ -139,6 +139,49 @@
     </div>
   </div>
 
+  <!-- Panel de Administración -->
+  <div id="admin-panel" style="display:none;">
+    <div class="admin-header">
+      <h1>Administrador</h1>
+      <button onclick="logoutAdmin()" class="logout-btn">Cerrar Sesión</button>
+    </div>
+    
+    <div class="admin-tabs">
+      <button class="admin-tab-button active" onclick="showAdminTab('horas-tab')">Gestionar Horas de Atención</button>
+      <button class="admin-tab-button" onclick="showAdminTab('reservas-tab')">Gestionar Reservas</button>
+      <button class="admin-tab-button" onclick="showAdminTab('galeria-tab')">Gestionar Galería</button>
+    </div>
+    
+    <div class="admin-content">
+      <!-- Pestaña Horas de Atención -->
+      <div id="horas-tab" class="admin-tab-content" style="display:block;">
+        <h2>Gestionar Horas de Atención</h2>
+        <p>Aquí podrás configurar los horarios de atención del estudio.</p>
+        <div class="coming-soon">
+          <p>🕒 Funcionalidad en desarrollo...</p>
+        </div>
+      </div>
+      
+      <!-- Pestaña Reservas -->
+      <div id="reservas-tab" class="admin-tab-content" style="display:none;">
+        <h2>Gestionar Reservas</h2>
+        <p>Aquí podrás ver y administrar todas las reservas del estudio.</p>
+        <div class="coming-soon">
+          <p>📅 Funcionalidad en desarrollo...</p>
+        </div>
+      </div>
+      
+      <!-- Pestaña Galería -->
+      <div id="galeria-tab" class="admin-tab-content" style="display:none;">
+        <h2>Gestionar Galería</h2>
+        <p>Aquí podrás subir y administrar las fotos de la galería del estudio.</p>
+        <div class="coming-soon">
+          <p>🖼️ Funcionalidad en desarrollo...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <footer><p>&copy; 2025 Estudio Daniel Merquiz</p></footer>
 </body>
 </html>

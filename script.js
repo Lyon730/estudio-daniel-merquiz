@@ -76,12 +76,71 @@ if (document.getElementById("admin-login-form")) {
     const pass = document.getElementById("admin-pass").value.trim();
     // Usuario y contraseña de ejemplo
     if (user === "admin" && pass === "1234") {
-      alert("Bienvenido administrador");
       document.getElementById("login-modal").style.display = "none";
-      // Aquí puedes redirigir o mostrar opciones de admin
+      showAdminPanel();
     } else {
       document.getElementById("login-error").style.display = "block";
     }
   });
+}
+
+// Función para mostrar el panel de administración
+function showAdminPanel() {
+  // Ocultar el contenido principal
+  document.querySelector('header').style.display = 'none';
+  document.querySelector('main').style.display = 'none';
+  document.querySelector('footer').style.display = 'none';
+  document.querySelector('.sticky-nav').style.display = 'none';
+  
+  // Mostrar el panel de administración
+  const adminPanel = document.getElementById('admin-panel');
+  if (adminPanel) {
+    adminPanel.style.display = 'block';
+  }
+}
+
+// Función para cerrar sesión de admin
+function logoutAdmin() {
+  // Mostrar el contenido principal
+  document.querySelector('header').style.display = 'block';
+  document.querySelector('main').style.display = 'block';
+  document.querySelector('footer').style.display = 'block';
+  document.querySelector('.sticky-nav').style.display = 'block';
+  
+  // Ocultar el panel de administración
+  const adminPanel = document.getElementById('admin-panel');
+  if (adminPanel) {
+    adminPanel.style.display = 'none';
+  }
+  
+  // Limpiar formulario de login
+  document.getElementById("admin-user").value = '';
+  document.getElementById("admin-pass").value = '';
+  document.getElementById("login-error").style.display = "none";
+}
+
+// Función para cambiar pestañas en el panel de admin
+function showAdminTab(tabName) {
+  // Ocultar todas las pestañas
+  document.querySelectorAll('.admin-tab-content').forEach(tab => {
+    tab.style.display = 'none';
+  });
+  
+  // Remover clase activa de todos los botones
+  document.querySelectorAll('.admin-tab-button').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  
+  // Mostrar la pestaña seleccionada
+  const selectedTab = document.getElementById(tabName);
+  if (selectedTab) {
+    selectedTab.style.display = 'block';
+  }
+  
+  // Activar el botón correspondiente
+  const selectedButton = document.querySelector(`[onclick="showAdminTab('${tabName}')"]`);
+  if (selectedButton) {
+    selectedButton.classList.add('active');
+  }
 }
 // --- FIN INICIO DE SESIÓN ADMIN ---

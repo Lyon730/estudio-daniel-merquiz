@@ -1,5 +1,43 @@
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+
+// ===== CONFIGURACIÓN DE FIREBASE =====
+// IMPORTANTE: Reemplaza esta configuración con la tuya desde Firebase Console
+const firebaseConfig = {
+  apiKey: "AIzaSyCqix70kqE3MPh_lwz0uolGECT1MerteUU",
+  authDomain: "estudio-daniel-merquiz.firebaseapp.com",
+  databaseURL: "https://estudio-daniel-merquiz-default-rtdb.firebaseio.com",
+  projectId: "estudio-daniel-merquiz",
+  storageBucket: "estudio-daniel-merquiz.firebasestorage.app",
+  messagingSenderId: "876381250367",
+  appId: "1:876381250367:web:90c685ecce6312b362a98a",
+  measurementId: "G-LP5VVC2WS7"
+};
+
+// Inicializar Firebase
+let database;
+try {
+  if (typeof firebase !== 'undefined') {
+    firebase.initializeApp(firebaseConfig);
+    database = firebase.database();
+    console.log('🔥 Firebase inicializado correctamente');
+  } else {
+    console.warn('⚠️ Firebase no está disponible, usando modo local');
+    database = null;
+  }
+} catch (error) {
+  console.error('❌ Error al inicializar Firebase:', error);
+  database = null;
+}
+
 // Confirmación de reserva y armado de mensaje para WhatsApp
-document.getElementById("form-reserva").addEventListener("submit", function (e) {
+document.getElementById("form-reserva").addEventListener("submit", async function (e) {
   e.preventDefault();
   const nombre = document.getElementById("nombre").value.trim();
   const telefono = document.getElementById("telefono").value.trim();
@@ -19,12 +57,40 @@ document.getElementById("form-reserva").addEventListener("submit", function (e) 
     day: 'numeric'
   });
   
+  // Crear clave para la reserva
+  const año = fecha.getFullYear();
+  const mes = fecha.getMonth() + 1;
+  const dia = fecha.getDate();
+  const claveReserva = `${año}-${mes}-${dia}-${horaSeleccionada}`;
+  
+  // Marcar la hora como ocupada con información del cliente
+  reservasOcupadas[claveReserva] = {
+    nombre: nombre,
+    telefono: telefono,
+    fecha: fechaReserva,
+    hora: horaSeleccionada,
+    fechaReserva: new Date().toISOString(),
+    tipo: 'cliente',
+    confirmada: false // Se confirmará cuando envíe por WhatsApp
+  };
+  
+  // Guardar en Firebase
+  try {
+    await guardarReservasEnFirebase();
+    console.log('✅ Reserva guardada en Firebase');
+  } catch (error) {
+    console.error('❌ Error al guardar reserva:', error);
+  }
+  
   const mensaje = `Hola, soy ${nombre}. Quiero reservar para el ${fechaFmt} a las ${horaSeleccionada}. Mi teléfono: ${telefono}.`;
   const wa = document.getElementById("wa-btn");
   const base = wa.getAttribute("href").split("?")[0];
   wa.setAttribute("href", base + `?text=${encodeURIComponent(mensaje)}`);
 
-  alert("Reserva preparada. Presiona el botón verde para enviar por WhatsApp.");
+  alert("Reserva guardada exitosamente. Presiona el botón verde para confirmar por WhatsApp.");
+  
+  // Actualizar la vista de horas disponibles
+  mostrarHorasDisponibles();
 });
 
 // Pausar video cuando la pestaña no está visible
@@ -111,9 +177,9 @@ function showAdminPanel() {
     adminPanel.style.display = 'block';
   }
   
-  // Inicializar el calendario después de que el panel sea visible
-  // Usar setTimeout para asegurar que el DOM esté completamente renderizado
-  setTimeout(() => {
+  // Inicializar datos y calendario después de que el panel sea visible
+  setTimeout(async () => {
+    await inicializarDatos();
     inicializarCalendario();
   }, 100);
 }
@@ -176,6 +242,136 @@ function showAdminTab(tabName) {
 // ===== SISTEMA DE CALENDARIO PARA HORARIOS =====
 let fechaActual = new Date();
 let horariosGuardados = {}; // Almacenará los horarios por fecha
+let reservasOcupadas = {}; // Almacenará las reservas ocupadas por fecha y hora
+
+// ===== FUNCIONES DE FIREBASE =====
+
+// Función para cargar horarios desde Firebase
+async function cargarHorariosDesdeFirebase() {
+  if (!database) {
+    console.log('Firebase no disponible, usando datos locales');
+    return;
+  }
+  
+  try {
+    const snapshot = await database.ref('horarios').once('value');
+    const horarios = snapshot.val();
+    
+    if (horarios) {
+      horariosGuardados = horarios;
+      console.log('✅ Horarios cargados desde Firebase:', horarios);
+      
+      // Actualizar el calendario si está visible
+      if (document.getElementById('calendar-days')) {
+        mostrarCalendario(fechaActual.getFullYear(), fechaActual.getMonth());
+      }
+    }
+  } catch (error) {
+    console.error('❌ Error al cargar horarios desde Firebase:', error);
+  }
+}
+
+// Función para guardar horarios en Firebase
+async function guardarHorariosEnFirebase() {
+  if (!database) {
+    console.log('Firebase no disponible, guardando solo localmente');
+    return;
+  }
+  
+  try {
+    await database.ref('horarios').set(horariosGuardados);
+    console.log('✅ Horarios guardados en Firebase');
+  } catch (error) {
+    console.error('❌ Error al guardar horarios en Firebase:', error);
+  }
+}
+
+// Función para cargar reservas desde Firebase
+async function cargarReservasDesdeFirebase() {
+  if (!database) {
+    console.log('Firebase no disponible, usando datos locales');
+    return;
+  }
+  
+  try {
+    const snapshot = await database.ref('reservas').once('value');
+    const reservas = snapshot.val();
+    
+    if (reservas) {
+      reservasOcupadas = reservas;
+      console.log('✅ Reservas cargadas desde Firebase:', reservas);
+    }
+  } catch (error) {
+    console.error('❌ Error al cargar reservas desde Firebase:', error);
+  }
+}
+
+// Función para guardar reservas en Firebase
+async function guardarReservasEnFirebase() {
+  if (!database) {
+    console.log('Firebase no disponible, guardando solo localmente');
+    return;
+  }
+  
+  try {
+    await database.ref('reservas').set(reservasOcupadas);
+    console.log('✅ Reservas guardadas en Firebase');
+  } catch (error) {
+    console.error('❌ Error al guardar reservas en Firebase:', error);
+  }
+}
+
+// Función para limpiar datos antiguos automáticamente
+async function limpiarDatosAntiguos() {
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+  
+  let huboLimpieza = false;
+  
+  // Limpiar horarios de fechas pasadas
+  Object.keys(horariosGuardados).forEach(claveFecha => {
+    const [año, mes, dia] = claveFecha.split('-').map(Number);
+    const fecha = new Date(año, mes - 1, dia);
+    
+    if (fecha < hoy) {
+      delete horariosGuardados[claveFecha];
+      huboLimpieza = true;
+    }
+  });
+  
+  // Limpiar reservas de fechas pasadas
+  Object.keys(reservasOcupadas).forEach(claveReserva => {
+    const fechaParte = claveReserva.split('-').slice(0, 3).join('-');
+    const [año, mes, dia] = fechaParte.split('-').map(Number);
+    const fecha = new Date(año, mes - 1, dia);
+    
+    if (fecha < hoy) {
+      delete reservasOcupadas[claveReserva];
+      huboLimpieza = true;
+    }
+  });
+  
+  // Guardar los datos limpios si hubo cambios
+  if (huboLimpieza) {
+    console.log('🧹 Limpiando datos antiguos...');
+    await guardarHorariosEnFirebase();
+    await guardarReservasEnFirebase();
+  }
+}
+
+// Función para inicializar datos al cargar la página
+async function inicializarDatos() {
+  console.log('🚀 Inicializando datos...');
+  
+  // Cargar datos desde Firebase
+  await cargarHorariosDesdeFirebase();
+  await cargarReservasDesdeFirebase();
+  
+  // Limpiar datos antiguos
+  await limpiarDatosAntiguos();
+  
+  console.log('✅ Datos inicializados correctamente');
+}
 
 function inicializarCalendario() {
   // Verificar que los elementos del DOM estén disponibles
@@ -316,7 +512,7 @@ function cerrarModalHorarios() {
 
 // Manejar el envío del formulario de horarios
 if (document.getElementById('horarios-form')) {
-  document.getElementById('horarios-form').addEventListener('submit', function(e) {
+  document.getElementById('horarios-form').addEventListener('submit', async function(e) {
     e.preventDefault();
     
     const fecha = window.fechaSeleccionadaActual;
@@ -350,6 +546,9 @@ if (document.getElementById('horarios-form')) {
       }
     };
     
+    // Guardar en Firebase
+    await guardarHorariosEnFirebase();
+    
     // Actualizar el calendario para mostrar que tiene horarios
     mostrarCalendario(fechaActual.getFullYear(), fechaActual.getMonth());
     
@@ -367,7 +566,6 @@ if (document.getElementById('close-horarios')) {
 }
 
 // ===== SISTEMA DE GESTIÓN DE RESERVAS =====
-let reservasOcupadas = {}; // Almacenará las reservas ocupadas por fecha y hora
 
 // Función para mostrar todas las reservas disponibles
 function mostrarReservasDisponibles() {
@@ -518,12 +716,20 @@ function convertirMinutosAHora(minutos) {
   return `${horas.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
 }
 
-// Función para reservar una cita (placeholder por ahora)
-function reservarCita(claveSlot, hora) {
+// Función para reservar una cita (desde el panel admin)
+async function reservarCita(claveSlot, hora) {
   const confirmacion = confirm(`¿Confirmar reserva para las ${hora}?`);
   if (confirmacion) {
     // Marcar como ocupado
-    reservasOcupadas[claveSlot] = true;
+    reservasOcupadas[claveSlot] = {
+      fecha: new Date().toISOString(),
+      hora: hora,
+      tipo: 'admin',
+      confirmada: true
+    };
+    
+    // Guardar en Firebase
+    await guardarReservasEnFirebase();
     
     // Actualizar la vista
     mostrarReservasDisponibles();
@@ -708,7 +914,12 @@ function seleccionarHora(hora) {
 }
 
 // Validar que no se puedan seleccionar fechas pasadas
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
+  console.log('📱 Página cargada, inicializando...');
+  
+  // Cargar datos desde Firebase
+  await inicializarDatos();
+  
   const fechaInput = document.getElementById('fecha-reserva');
   if (fechaInput) {
     // Establecer fecha mínima como hoy
@@ -716,5 +927,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const fechaMinima = hoy.toISOString().split('T')[0];
     fechaInput.setAttribute('min', fechaMinima);
   }
+  
+  console.log('✅ Inicialización completa');
 });
 // --- FIN INICIO DE SESIÓN ADMIN ---

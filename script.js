@@ -238,14 +238,16 @@ async function cargarHorariosDesdeFirebase() {
 async function guardarHorariosEnFirebase() {
   if (!database) {
     console.log('Firebase no disponible, guardando solo localmente');
-    return;
+    return false;
   }
-  
   try {
+    console.log('⏫ Enviando horarios a Firebase...', horariosGuardados);
     await database.ref('horarios').set(horariosGuardados);
     console.log('✅ Horarios guardados en Firebase');
+    return true;
   } catch (error) {
     console.error('❌ Error al guardar horarios en Firebase:', error);
+    return false;
   }
 }
 
@@ -477,49 +479,44 @@ function cerrarModalHorarios() {
 if (document.getElementById('horarios-form')) {
   document.getElementById('horarios-form').addEventListener('submit', async function(e) {
     e.preventDefault();
-    
+    console.log('📝 Enviando formulario de horarios...');
     const fecha = window.fechaSeleccionadaActual;
-    if (!fecha) return;
-    
-    // Obtener los valores del formulario
+    if (!fecha) {
+      console.warn('⚠️ No hay fecha seleccionada');
+      return;
+    }
     const mananaInicio = document.getElementById('manana-inicio').value;
     const mananaFin = document.getElementById('manana-fin').value;
     const tardeInicio = document.getElementById('tarde-inicio').value;
     const tardeFin = document.getElementById('tarde-fin').value;
-    
-    // Validar que al menos un turno esté completo
     const tieneManana = mananaInicio && mananaFin;
     const tieneTarde = tardeInicio && tardeFin;
-    
     if (!tieneManana && !tieneTarde) {
       alert('Debe configurar al menos un turno completo (mañana o tarde)');
       return;
     }
-    
-    // Guardar los horarios
     const claveFecha = `${fecha.getFullYear()}-${fecha.getMonth() + 1}-${fecha.getDate()}`;
     horariosGuardados[claveFecha] = {
-      mañana: {
-        inicio: mananaInicio,
-        fin: mananaFin
-      },
-      tarde: {
-        inicio: tardeInicio,
-        fin: tardeFin
-      }
+      mañana: { inicio: mananaInicio, fin: mananaFin },
+      tarde: { inicio: tardeInicio, fin: tardeFin }
     };
-    
-    // Guardar en Firebase
-    await guardarHorariosEnFirebase();
-    
-    // Actualizar el calendario para mostrar que tiene horarios
-    mostrarCalendario(fechaActual.getFullYear(), fechaActual.getMonth());
-    
-    // Cerrar el modal
+    console.log('🗃️ Horarios preparados para guardar:', claveFecha, horariosGuardados[claveFecha]);
+    // Cerrar modal inmediatamente para mejor UX
     cerrarModalHorarios();
-    
-    // Mostrar confirmación
-    alert('Horarios guardados exitosamente para ' + fecha.toLocaleDateString('es-ES'));
+    let guardadoOk = false;
+    try {
+      guardadoOk = await guardarHorariosEnFirebase();
+    } catch (err) {
+      console.error('❌ Excepción al guardar en Firebase:', err);
+    } finally {
+      // Refrescar calendario siempre
+      mostrarCalendario(fechaActual.getFullYear(), fechaActual.getMonth());
+    }
+    if (guardadoOk) {
+      alert('Horarios guardados exitosamente para ' + fecha.toLocaleDateString('es-ES'));
+    } else {
+      alert('Horarios guardados localmente. (No se pudo guardar en Firebase ahora)');
+    }
   });
 }
 

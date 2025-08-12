@@ -203,56 +203,56 @@
 
   <!-- Modal para configurar horarios de trabajo -->
   <div id="horarios-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:10000; justify-content:center; align-items:center;">
-    <div style="background:#fff; padding:30px; border-radius:12px; min-width:500px; max-width:90vw; position:relative; color:#1c1c1c;">
-      <span id="close-horarios" style="position:absolute; top:15px; right:20px; cursor:pointer; font-size:24px; color:#666;">&times;</span>
+    <div style="background:#fff; padding:20px; border-radius:8px; width:90%; max-width:450px; max-height:90vh; overflow-y:auto; position:relative; color:#1c1c1c;">
+      <span id="close-horarios" style="position:absolute; top:10px; right:15px; cursor:pointer; font-size:20px; color:#666;">&times;</span>
       
-      <h2 style="color:#1c1c1c; text-align:center; margin-bottom:20px;">Configurar Horarios</h2>
-      <p id="fecha-seleccionada" style="text-align:center; font-weight:bold; color:#2e2e2e; margin-bottom:30px;"></p>
+      <h2 style="color:#1c1c1c; text-align:center; margin-bottom:10px; font-size:1.3rem;">Configurar Horarios</h2>
+      <p id="fecha-seleccionada" style="text-align:center; font-weight:bold; color:#2e2e2e; margin-bottom:20px; font-size:0.9rem;"></p>
       
       <form id="horarios-form">
         <!-- Turno Mañana -->
         <div class="turno-section">
-          <h3 style="color:#2e2e2e; margin-bottom:15px;">🌅 Turno Mañana</h3>
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:20px;">
+          <h3 style="color:#2e2e2e; margin-bottom:10px; font-size:1.1rem;">🌅 Turno Mañana</h3>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px;">
             <div>
-              <label style="display:block; margin-bottom:5px; font-weight:bold;">Hora Inicio:</label>
-              <input type="time" id="manana-inicio" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
+              <label style="display:block; margin-bottom:3px; font-weight:bold; font-size:0.85rem;">Hora Inicio:</label>
+              <input type="time" id="manana-inicio" style="width:100%; padding:6px; border:1px solid #ccc; border-radius:4px; font-size:0.9rem;">
             </div>
             <div>
-              <label style="display:block; margin-bottom:5px; font-weight:bold;">Hora Término:</label>
-              <input type="time" id="manana-fin" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
+              <label style="display:block; margin-bottom:3px; font-weight:bold; font-size:0.85rem;">Hora Término:</label>
+              <input type="time" id="manana-fin" style="width:100%; padding:6px; border:1px solid #ccc; border-radius:4px; font-size:0.9rem;">
             </div>
           </div>
         </div>
         
         <!-- Turno Tarde -->
         <div class="turno-section">
-          <h3 style="color:#2e2e2e; margin-bottom:15px;">🌆 Turno Tarde</h3>
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:30px;">
+          <h3 style="color:#2e2e2e; margin-bottom:10px; font-size:1.1rem;">🌆 Turno Tarde</h3>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px;">
             <div>
-              <label style="display:block; margin-bottom:5px; font-weight:bold;">Hora Inicio:</label>
-              <input type="time" id="tarde-inicio" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
+              <label style="display:block; margin-bottom:3px; font-weight:bold; font-size:0.85rem;">Hora Inicio:</label>
+              <input type="time" id="tarde-inicio" style="width:100%; padding:6px; border:1px solid #ccc; border-radius:4px; font-size:0.9rem;">
             </div>
             <div>
-              <label style="display:block; margin-bottom:5px; font-weight:bold;">Hora Término:</label>
-              <input type="time" id="tarde-fin" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
+              <label style="display:block; margin-bottom:3px; font-weight:bold; font-size:0.85rem;">Hora Término:</label>
+              <input type="time" id="tarde-fin" style="width:100%; padding:6px; border:1px solid #ccc; border-radius:4px; font-size:0.9rem;">
             </div>
           </div>
         </div>
         
         <!-- Información adicional -->
-        <div style="background:#f8f9fa; padding:15px; border-radius:8px; margin-bottom:20px;">
-          <p style="margin:0; font-size:0.9rem; color:#666;">
+        <div style="background:#f8f9fa; padding:10px; border-radius:6px; margin-bottom:15px;">
+          <p style="margin:0; font-size:0.8rem; color:#666;">
             ℹ️ <strong>Nota:</strong> Las citas se programarán cada 30 minutos dentro de los horarios establecidos.
           </p>
         </div>
         
         <!-- Botones -->
-        <div style="display:flex; gap:10px; justify-content:flex-end;">
-          <button type="button" onclick="cerrarModalHorarios()" style="background:#6c757d; color:white; border:none; padding:10px 20px; border-radius:6px; cursor:pointer;">
+        <div style="display:flex; gap:8px; justify-content:flex-end;">
+          <button type="button" onclick="cerrarModalHorarios()" style="background:#6c757d; color:white; border:none; padding:8px 16px; border-radius:4px; cursor:pointer; font-size:0.9rem;">
             Cancelar
           </button>
-          <button type="submit" style="background:#28a745; color:white; border:none; padding:10px 20px; border-radius:6px; cursor:pointer;">
+          <button type="submit" style="background:#28a745; color:white; border:none; padding:8px 16px; border-radius:4px; cursor:pointer; font-size:0.9rem;">
             Guardar Horarios
           </button>
         </div>

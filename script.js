@@ -3,9 +3,9 @@
 const firebaseConfig = {
   apiKey: "AIzaSyCqix70kqE3MPh_lwz0uolGECT1MerteUU",
   authDomain: "estudio-daniel-merquiz.firebaseapp.com",
-  databaseURL: "https://estudio-daniel-merquiz-default-rtdb.firebaseio.com", // <-- añadida (faltaba)
+  databaseURL: "https://estudio-daniel-merquiz-default-rtdb.firebaseio.com",
   projectId: "estudio-daniel-merquiz",
-  storageBucket: "estudio-daniel-merquiz.firebasestorage.app",
+  storageBucket: "estudio-daniel-merquiz.appspot.com", // Corregido el dominio
   messagingSenderId: "876381250367",
   appId: "1:876381250367:web:90c685ecce6312b362a98a",
   measurementId: "G-LP5VVC2WS7"
@@ -982,7 +982,28 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 // === FUNCIONES FIREBASE PARA GALERÍA ===
 async function cargarImagenesGaleriaDesdeFirebase() {
-  if (!database) return;
+  // Detectar si estamos en desarrollo local
+  const isLocalDev = window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  
+  if (isLocalDev || !database) {
+    // Modo desarrollo: cargar desde localStorage
+    try {
+      const stored = localStorage.getItem('galeriaImagenes');
+      if (stored) {
+        galeriaImagenes = JSON.parse(stored);
+        console.log('✅ (load) Imágenes desde localStorage:', galeriaImagenes.length);
+      } else {
+        console.log('ℹ️ (load) No hay imágenes en localStorage');
+        galeriaImagenes = [];
+      }
+    } catch (err) {
+      console.error('❌ Error cargando desde localStorage:', err);
+      galeriaImagenes = [];
+    }
+    return;
+  }
+  
+  // Modo producción: cargar desde Firebase
   try {
     const snap = await database.ref('galeria').once('value');
     const data = snap.val();
@@ -1067,11 +1088,6 @@ async function subirArchivos(files) {
   const progressFill = document.getElementById('progress-fill');
   const progressText = document.getElementById('progress-text');
   
-  if (!storage) {
-    alert('❌ Sistema de almacenamiento no disponible. Verifica la conexión.');
-    return;
-  }
-  
   progressBar.style.display = 'block';
   progressFill.style.width = '0%';
   progressText.textContent = 'Preparando subida...';
@@ -1080,76 +1096,26 @@ async function subirArchivos(files) {
   let completados = 0;
   
   try {
-    for (const file of files) {
-      // Validar archivo
-      if (!file.type.startsWith('image/')) {
-        console.warn(`⚠️ Archivo ignorado (no es imagen): ${file.name}`);
-        completados++;
-        continue;
-      }
-      
-      if (file.size > 5 * 1024 * 1024) { // 5MB
-        alert(`❌ ${file.name} es muy grande (máx. 5MB)`);
-        completados++;
-        continue;
-      }
-      
-      // Generar nombre único
-      const timestamp = Date.now();
-      const extension = file.name.split('.').pop();
-      const nombreArchivo = `galeria_${timestamp}_${Math.random().toString(36).substr(2, 9)}.${extension}`;
-      
-      // Subir a Firebase Storage
-      progressText.textContent = `Subiendo ${file.name}...`;
-      
-      const storageRef = storage.ref(`galeria/${nombreArchivo}`);
-      
-      const uploadTask = storageRef.put(file);
-      
-      await new Promise((resolve, reject) => {
-        uploadTask.on('state_changed',
-          (snapshot) => {
-            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            const progressTotal = ((completados + (progress/100)) / files.length) * 100;
-            progressFill.style.width = `${progressTotal}%`;
-          },
-          (error) => {
-            console.error('❌ Error subida:', error);
-            reject(error);
-          },
-          async () => {
-            try {
-              const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
-              
-              const nuevaImagen = {
-                id: `img_${timestamp}_${Math.random().toString(36).substr(2, 9)}`,
-                nombre: file.name,
-                nombreArchivo: nombreArchivo,
-                url: downloadURL,
-                fechaSubida: new Date().toISOString(),
-                tamaño: file.size
-              };
-              
-              nuevasImagenes.push(nuevaImagen);
-              completados++;
-              
-              const progressTotal = (completados / files.length) * 100;
-              progressFill.style.width = `${progressTotal}%`;
-              
-              resolve();
-            } catch (error) {
-              reject(error);
-            }
-          }
-        );
-      });
+    // Detectar si estamos en desarrollo local (file://) o producción
+    const isLocalDev = window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    
+    if (isLocalDev || !storage) {
+      // Modo desarrollo: usar URLs de archivos locales
+      await subirArchivosLocal(files, progressFill, progressText, nuevasImagenes, completados);
+    } else {
+      // Modo producción: usar Firebase Storage
+      await subirArchivosFirebase(files, progressFill, progressText, nuevasImagenes, completados);
     }
     
     // Agregar imágenes al array global
     galeriaImagenes.push(...nuevasImagenes);
     
-    // Guardar en Firebase Database
-    await guardarImagenesGaleriaEnFirebase();
+    // Guardar en Firebase Database (si está disponible) o localStorage
+    if (database) {
+      await guardarImagenesGaleriaEnFirebase();
+    } else {
+      localStorage.setItem('galeriaImagenes', JSON.stringify(galeriaImagenes));
+    }
     
     progressText.textContent = `✅ ${nuevasImagenes.length} imagen(es) subida(s)`;
     
@@ -1168,7 +1134,7 @@ async function subirArchivos(files) {
   } catch (error) {
     console.error('❌ Error en subida:', error);
     progressText.textContent = '❌ Error en la subida';
-    alert('Error al subir las imágenes. Inténtalo de nuevo.');
+    alert('Error al subir las imágenes: ' + error.message);
     
     setTimeout(() => {
       progressBar.style.display = 'none';
@@ -1176,11 +1142,135 @@ async function subirArchivos(files) {
   }
 }
 
+// Función para subir archivos en modo desarrollo local
+async function subirArchivosLocal(files, progressFill, progressText, nuevasImagenes, completados) {
+  for (const file of files) {
+    // Validar archivo
+    if (!file.type.startsWith('image/')) {
+      console.warn(`⚠️ Archivo ignorado (no es imagen): ${file.name}`);
+      completados++;
+      continue;
+    }
+    
+    if (file.size > 5 * 1024 * 1024) { // 5MB
+      alert(`❌ ${file.name} es muy grande (máx. 5MB)`);
+      completados++;
+      continue;
+    }
+    
+    progressText.textContent = `Procesando ${file.name}...`;
+    
+    // Crear URL de objeto para mostrar la imagen
+    const imageUrl = URL.createObjectURL(file);
+    
+    // Generar ID único
+    const timestamp = Date.now();
+    const id = `img_${timestamp}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    const nuevaImagen = {
+      id: id,
+      nombre: file.name,
+      nombreArchivo: file.name,
+      url: imageUrl,
+      fechaSubida: new Date().toISOString(),
+      tamaño: file.size,
+      tipo: 'local' // Marcar como imagen local
+    };
+    
+    nuevasImagenes.push(nuevaImagen);
+    completados++;
+    
+    const progressTotal = (completados / files.length) * 100;
+    progressFill.style.width = `${progressTotal}%`;
+    
+    // Simular un pequeño delay para mostrar el progreso
+    await new Promise(resolve => setTimeout(resolve, 200));
+  }
+}
+
+// Función para subir archivos a Firebase Storage
+async function subirArchivosFirebase(files, progressFill, progressText, nuevasImagenes, completados) {
+  for (const file of files) {
+    // Validar archivo
+    if (!file.type.startsWith('image/')) {
+      console.warn(`⚠️ Archivo ignorado (no es imagen): ${file.name}`);
+      completados++;
+      continue;
+    }
+    
+    if (file.size > 5 * 1024 * 1024) { // 5MB
+      alert(`❌ ${file.name} es muy grande (máx. 5MB)`);
+      completados++;
+      continue;
+    }
+    
+    // Generar nombre único
+    const timestamp = Date.now();
+    const extension = file.name.split('.').pop();
+    const nombreArchivo = `galeria_${timestamp}_${Math.random().toString(36).substr(2, 9)}.${extension}`;
+    
+    // Subir a Firebase Storage
+    progressText.textContent = `Subiendo ${file.name}...`;
+    
+    const storageRef = storage.ref(`galeria/${nombreArchivo}`);
+    
+    const uploadTask = storageRef.put(file);
+    
+    await new Promise((resolve, reject) => {
+      uploadTask.on('state_changed',
+        (snapshot) => {
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          const progressTotal = ((completados + (progress/100)) / files.length) * 100;
+          progressFill.style.width = `${progressTotal}%`;
+        },
+        (error) => {
+          console.error('❌ Error subida:', error);
+          reject(error);
+        },
+        async () => {
+          try {
+            const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
+            
+            const nuevaImagen = {
+              id: `img_${timestamp}_${Math.random().toString(36).substr(2, 9)}`,
+              nombre: file.name,
+              nombreArchivo: nombreArchivo,
+              url: downloadURL,
+              fechaSubida: new Date().toISOString(),
+              tamaño: file.size,
+              tipo: 'firebase'
+            };
+            
+            nuevasImagenes.push(nuevaImagen);
+            completados++;
+            
+            const progressTotal = (completados / files.length) * 100;
+            progressFill.style.width = `${progressTotal}%`;
+            
+            resolve();
+          } catch (error) {
+            reject(error);
+          }
+        }
+      );
+    });
+  }
+}
+
 function mostrarImagenesAdmin() {
   const grid = document.getElementById('admin-images-grid');
   const stats = document.getElementById('gallery-stats');
+  const devInfo = document.getElementById('dev-info');
   
   if (!grid || !stats) return;
+  
+  // Detectar modo desarrollo
+  const isLocalDev = window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  
+  // Mostrar/ocultar mensaje de desarrollo
+  if (devInfo) {
+    devInfo.style.display = isLocalDev ? 'block' : 'none';
+  }
   
   // Actualizar estadísticas
   const imageCount = galeriaImagenes.length;
@@ -1207,7 +1297,7 @@ function mostrarImagenesAdmin() {
       </div>
       <div class="image-info">
         <p class="image-name">${img.nombre}</p>
-        <p class="image-size">${formatearTamaño(img.tamaño)}</p>
+        <p class="image-size">${formatearTamaño(img.tamaño)} ${img.tipo === 'local' ? '(Local)' : ''}</p>
       </div>
     </div>
   `).join('');
@@ -1223,11 +1313,15 @@ async function eliminarImagen(imageId) {
   if (!confirmar) return;
   
   try {
-    // Eliminar de Firebase Storage
-    if (storage) {
+    // Si es una imagen de Firebase Storage, eliminarla de allí
+    if (imagen.tipo === 'firebase' && storage) {
       const storageRef = storage.ref(`galeria/${imagen.nombreArchivo}`);
       await storageRef.delete();
-      console.log('✅ Imagen eliminada de Storage');
+      console.log('✅ Imagen eliminada de Firebase Storage');
+    } else if (imagen.tipo === 'local' && imagen.url) {
+      // Si es una imagen local, revocar la URL del objeto
+      URL.revokeObjectURL(imagen.url);
+      console.log('✅ URL de objeto revocada');
     }
     
     // Eliminar del array local
@@ -1236,8 +1330,12 @@ async function eliminarImagen(imageId) {
       galeriaImagenes.splice(index, 1);
     }
     
-    // Actualizar Firebase Database
-    await guardarImagenesGaleriaEnFirebase();
+    // Guardar cambios
+    if (database) {
+      await guardarImagenesGaleriaEnFirebase();
+    } else {
+      localStorage.setItem('galeriaImagenes', JSON.stringify(galeriaImagenes));
+    }
     
     // Actualizar vistas
     mostrarImagenesAdmin();
@@ -1247,7 +1345,7 @@ async function eliminarImagen(imageId) {
     
   } catch (error) {
     console.error('❌ Error al eliminar imagen:', error);
-    alert('Error al eliminar la imagen. Inténtalo de nuevo.');
+    alert('Error al eliminar la imagen: ' + error.message);
   }
 }
 

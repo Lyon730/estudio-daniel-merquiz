@@ -19,6 +19,16 @@ try {
     database = firebase.database();
     storage = firebase.storage();
     console.log('🔥 Firebase inicializado correctamente');
+    
+    // Test de conectividad
+    database.ref('.info/connected').on('value', (snapshot) => {
+      if (snapshot.val() === true) {
+        console.log('✅ Conectado a Firebase Database');
+      } else {
+        console.warn('⚠️ Desconectado de Firebase Database');
+      }
+    });
+    
   } else {
     console.warn('⚠️ Firebase no está disponible, usando modo local');
     database = null;
@@ -26,6 +36,7 @@ try {
   }
 } catch (error) {
   console.error('❌ Error al inicializar Firebase:', error);
+  console.log('🔧 Cambiando a modo local automáticamente');
   database = null;
   storage = null;
 }
@@ -982,11 +993,15 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 // === FUNCIONES FIREBASE PARA GALERÍA ===
 async function cargarImagenesGaleriaDesdeFirebase() {
-  // Detectar si estamos en desarrollo local
-  const isLocalDev = window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  // Detectar si estamos en modo local (incluye GitHub Pages por ahora)
+  const isLocalMode = window.location.protocol === 'file:' || 
+                      window.location.hostname === 'localhost' || 
+                      window.location.hostname === '127.0.0.1' ||
+                      window.location.hostname.includes('github.io') || 
+                      !database;
   
-  if (isLocalDev || !database) {
-    // Modo desarrollo: cargar desde localStorage
+  if (isLocalMode) {
+    // Modo local: cargar desde localStorage
     try {
       const stored = localStorage.getItem('galeriaImagenes');
       if (stored) {
@@ -1016,7 +1031,19 @@ async function cargarImagenesGaleriaDesdeFirebase() {
     }
   } catch (err) {
     console.error('❌ cargarImagenesGaleriaDesdeFirebase:', err);
-    galeriaImagenes = [];
+    // Fallback a localStorage si Firebase falla
+    try {
+      const stored = localStorage.getItem('galeriaImagenes');
+      if (stored) {
+        galeriaImagenes = JSON.parse(stored);
+        console.log('✅ (fallback) Imágenes desde localStorage:', galeriaImagenes.length);
+      } else {
+        galeriaImagenes = [];
+      }
+    } catch (localErr) {
+      console.error('❌ Error en fallback localStorage:', localErr);
+      galeriaImagenes = [];
+    }
   }
 }
 
@@ -1096,25 +1123,39 @@ async function subirArchivos(files) {
   let completados = 0;
   
   try {
-    // Detectar si estamos en desarrollo local (file://) o producción
-    const isLocalDev = window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    // Forzar modo local mientras solucionamos Firebase Storage
+    const useLocalMode = true; // Cambiar a false cuando Firebase esté configurado
     
-    if (isLocalDev || !storage) {
-      // Modo desarrollo: usar URLs de archivos locales
+    // También detectar automáticamente
+    const isLocalDev = window.location.protocol === 'file:' || 
+                       window.location.hostname === 'localhost' || 
+                       window.location.hostname === '127.0.0.1' ||
+                       window.location.hostname.includes('github.io'); // GitHub Pages
+    
+    if (useLocalMode || isLocalDev || !storage) {
+      // Modo desarrollo/local: usar URLs de archivos locales
+      console.log('🔧 Usando modo local para almacenamiento');
       await subirArchivosLocal(files, progressFill, progressText, nuevasImagenes, completados);
     } else {
       // Modo producción: usar Firebase Storage
+      console.log('☁️ Usando Firebase Storage');
       await subirArchivosFirebase(files, progressFill, progressText, nuevasImagenes, completados);
     }
     
     // Agregar imágenes al array global
     galeriaImagenes.push(...nuevasImagenes);
     
-    // Guardar en Firebase Database (si está disponible) o localStorage
+    // Guardar en localStorage para persistencia
+    localStorage.setItem('galeriaImagenes', JSON.stringify(galeriaImagenes));
+    
+    // Intentar guardar en Firebase Database si está disponible (opcional)
     if (database) {
-      await guardarImagenesGaleriaEnFirebase();
-    } else {
-      localStorage.setItem('galeriaImagenes', JSON.stringify(galeriaImagenes));
+      try {
+        await guardarImagenesGaleriaEnFirebase();
+        console.log('✅ También guardado en Firebase Database');
+      } catch (err) {
+        console.warn('⚠️ No se pudo guardar en Firebase Database (continuando con localStorage)');
+      }
     }
     
     progressText.textContent = `✅ ${nuevasImagenes.length} imagen(es) subida(s)`;
@@ -1264,23 +1305,28 @@ function mostrarImagenesAdmin() {
   
   if (!grid || !stats) return;
   
-  // Detectar modo desarrollo
-  const isLocalDev = window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  // Detectar modo local
+  const isLocalMode = window.location.protocol === 'file:' || 
+                      window.location.hostname === 'localhost' || 
+                      window.location.hostname === '127.0.0.1' ||
+                      window.location.hostname.includes('github.io');
   
-  // Mostrar/ocultar mensaje de desarrollo
+  // Mostrar/ocultar mensaje informativo
   if (devInfo) {
-    devInfo.style.display = isLocalDev ? 'block' : 'none';
+    devInfo.style.display = isLocalMode ? 'block' : 'none';
   }
   
   // Actualizar estadísticas
   const imageCount = galeriaImagenes.length;
-  stats.innerHTML = `<span class="image-count">${imageCount} imagen${imageCount !== 1 ? 'es' : ''}</span>`;
+  const modoTexto = isLocalMode ? ' (Modo Local)' : '';
+  stats.innerHTML = `<span class="image-count">${imageCount} imagen${imageCount !== 1 ? 'es' : ''}${modoTexto}</span>`;
   
   if (imageCount === 0) {
     grid.innerHTML = `
       <div class="no-images">
         <p>📷 No hay imágenes en la galería aún</p>
         <p>Sube algunas fotos para comenzar</p>
+        ${isLocalMode ? '<p><small>Las imágenes se almacenarán en tu navegador</small></p>' : ''}
       </div>
     `;
     return;

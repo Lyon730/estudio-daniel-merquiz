@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Galería - Estudio Daniel Merquiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #1c1c1c;
+            color: #f5f5dc;
+        }
+        .test-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(245, 245, 220, 0.05);
+            padding: 20px;
+            border-radius: 12px;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+        .status.ok { background: rgba(76, 175, 80, 0.2); border: 1px solid #4CAF50; }
+        .status.error { background: rgba(244, 67, 54, 0.2); border: 1px solid #f44336; }
+        .status.warning { background: rgba(255, 152, 0, 0.2); border: 1px solid #ff9800; }
+        
+        .upload-test {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            text-align: center;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        button:hover {
+            background: #45a049;
+        }
+        
+        .image-preview {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 8px;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Test de Galería</h1>
+        <p>Esta página prueba el sistema de galería sin Firebase</p>
+        
+        <div id="status-firebase" class="status">
+            ⏳ Verificando Firebase...
+        </div>
+        
+        <div id="status-localstorage" class="status">
+            ⏳ Verificando localStorage...
+        </div>
+        
+        <div id="status-environment" class="status">
+            ⏳ Detectando entorno...
+        </div>
+        
+        <div class="upload-test">
+            <h3>📸 Test de Carga de Imágenes</h3>
+            <input type="file" id="test-file" accept="image/*" multiple>
+            <br><br>
+            <button onclick="testUpload()">Probar Carga</button>
+            <button onclick="clearStorage()">Limpiar Caché</button>
+        </div>
+        
+        <div id="upload-results">
+            <!-- Resultados aparecerán aquí -->
+        </div>
+        
+        <div id="images-preview">
+            <!-- Previsualización de imágenes -->
+        </div>
+    </div>
+
+    <script>
+        // Variables de test
+        let testImages = [];
+        
+        // Test inicial
+        window.onload = function() {
+            testFirebase();
+            testLocalStorage();
+            testEnvironment();
+            loadExistingImages();
+        };
+        
+        function testFirebase() {
+            const status = document.getElementById('status-firebase');
+            try {
+                if (typeof firebase !== 'undefined') {
+                    status.innerHTML = '✅ Firebase SDK cargado correctamente';
+                    status.className = 'status ok';
+                } else {
+                    status.innerHTML = '⚠️ Firebase SDK no disponible (modo local activado)';
+                    status.className = 'status warning';
+                }
+            } catch (error) {
+                status.innerHTML = '❌ Error con Firebase: ' + error.message;
+                status.className = 'status error';
+            }
+        }
+        
+        function testLocalStorage() {
+            const status = document.getElementById('status-localstorage');
+            try {
+                localStorage.setItem('test', 'ok');
+                localStorage.removeItem('test');
+                status.innerHTML = '✅ localStorage funciona correctamente';
+                status.className = 'status ok';
+            } catch (error) {
+                status.innerHTML = '❌ localStorage no disponible: ' + error.message;
+                status.className = 'status error';
+            }
+        }
+        
+        function testEnvironment() {
+            const status = document.getElementById('status-environment');
+            const protocol = window.location.protocol;
+            const hostname = window.location.hostname;
+            
+            let mode = 'Desconocido';
+            let className = 'warning';
+            
+            if (protocol === 'file:') {
+                mode = 'Archivo local (file://)';
+                className = 'warning';
+            } else if (hostname === 'localhost' || hostname === '127.0.0.1') {
+                mode = 'Servidor local';
+                className = 'ok';
+            } else if (hostname.includes('github.io')) {
+                mode = 'GitHub Pages';
+                className = 'ok';
+            } else {
+                mode = 'Servidor web';
+                className = 'ok';
+            }
+            
+            status.innerHTML = `🌐 Entorno: ${mode} | URL: ${window.location.href}`;
+            status.className = `status ${className}`;
+        }
+        
+        function testUpload() {
+            const fileInput = document.getElementById('test-file');
+            const files = Array.from(fileInput.files);
+            const resultsDiv = document.getElementById('upload-results');
+            
+            if (files.length === 0) {
+                alert('Por favor selecciona al menos una imagen');
+                return;
+            }
+            
+            resultsDiv.innerHTML = '<h3>📤 Procesando...</h3>';
+            
+            const processedImages = [];
+            
+            files.forEach((file, index) => {
+                if (!file.type.startsWith('image/')) {
+                    console.warn('No es imagen:', file.name);
+                    return;
+                }
+                
+                const imageUrl = URL.createObjectURL(file);
+                const imageData = {
+                    id: `test_${Date.now()}_${index}`,
+                    nombre: file.name,
+                    url: imageUrl,
+                    tamaño: file.size,
+                    tipo: 'local',
+                    fechaSubida: new Date().toISOString()
+                };
+                
+                processedImages.push(imageData);
+            });
+            
+            // Agregar a array global
+            testImages.push(...processedImages);
+            
+            // Guardar en localStorage
+            try {
+                localStorage.setItem('testGaleriaImagenes', JSON.stringify(testImages));
+                
+                resultsDiv.innerHTML = `
+                    <div class="status ok">
+                        ✅ ${processedImages.length} imagen(es) procesada(s) correctamente
+                        <br>Total en caché: ${testImages.length} imágenes
+                    </div>
+                `;
+                
+                showImagesPreview();
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="status error">
+                        ❌ Error al guardar: ${error.message}
+                    </div>
+                `;
+            }
+        }
+        
+        function loadExistingImages() {
+            try {
+                const stored = localStorage.getItem('testGaleriaImagenes');
+                if (stored) {
+                    testImages = JSON.parse(stored);
+                    console.log('Imágenes cargadas:', testImages.length);
+                    showImagesPreview();
+                }
+            } catch (error) {
+                console.error('Error cargando imágenes:', error);
+            }
+        }
+        
+        function showImagesPreview() {
+            const previewDiv = document.getElementById('images-preview');
+            
+            if (testImages.length === 0) {
+                previewDiv.innerHTML = '<p>No hay imágenes en caché</p>';
+                return;
+            }
+            
+            const imagesHTML = testImages.map(img => `
+                <div style="display: inline-block; margin: 10px; text-align: center;">
+                    <img src="${img.url}" alt="${img.nombre}" class="image-preview">
+                    <br><small>${img.nombre}</small>
+                    <br><button onclick="removeImage('${img.id}')">Eliminar</button>
+                </div>
+            `).join('');
+            
+            previewDiv.innerHTML = `
+                <h3>🖼️ Imágenes en Caché (${testImages.length})</h3>
+                ${imagesHTML}
+            `;
+        }
+        
+        function removeImage(imageId) {
+            const index = testImages.findIndex(img => img.id === imageId);
+            if (index > -1) {
+                // Revocar URL del objeto para liberar memoria
+                URL.revokeObjectURL(testImages[index].url);
+                testImages.splice(index, 1);
+                
+                // Actualizar localStorage
+                localStorage.setItem('testGaleriaImagenes', JSON.stringify(testImages));
+                
+                // Actualizar preview
+                showImagesPreview();
+            }
+        }
+        
+        function clearStorage() {
+            if (confirm('¿Limpiar todas las imágenes del caché?')) {
+                // Revocar todas las URLs
+                testImages.forEach(img => {
+                    if (img.url && img.tipo === 'local') {
+                        URL.revokeObjectURL(img.url);
+                    }
+                });
+                
+                testImages = [];
+                localStorage.removeItem('testGaleriaImagenes');
+                localStorage.removeItem('galeriaImagenes'); // También el de la app principal
+                
+                showImagesPreview();
+                alert('Caché limpiado');
+            }
+        }
+    </script>
+</body>
+</html>

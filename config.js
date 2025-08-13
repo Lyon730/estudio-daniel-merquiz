@@ -63,6 +63,9 @@ const APP_CONFIG = {
 
 // Detectar modo automáticamente
 function detectStorageMode() {
+  // Si está configurado manualmente, respetar la configuración
+  const manualMode = APP_CONFIG.storage.mode;
+  
   const isLocalDev = window.location.protocol === 'file:' || 
                      window.location.hostname === 'localhost' || 
                      window.location.hostname === '127.0.0.1';
@@ -71,18 +74,26 @@ function detectStorageMode() {
                               window.database && 
                               window.storage;
   
-  // Si estamos en desarrollo local, usar localStorage
+  // Si está en desarrollo local (file://), forzar localStorage
   if (isLocalDev) {
+    console.log('🔧 Modo local detectado - usando localStorage');
     return 'local';
   }
   
-  // Si Firebase está disponible y configurado, usar Firebase
-  if (isFirebaseAvailable && APP_CONFIG.storage.mode === 'firebase') {
+  // Si Firebase está disponible y configurado manualmente como firebase
+  if (isFirebaseAvailable && manualMode === 'firebase') {
+    console.log('☁️ Modo Firebase activado');
     return 'firebase';
   }
   
-  // Fallback a localStorage
-  return 'local';
+  // Si Firebase no está disponible pero se configuró como firebase, avisar
+  if (manualMode === 'firebase' && !isFirebaseAvailable) {
+    console.warn('⚠️ Firebase configurado pero no disponible - usando localStorage');
+    return 'local';
+  }
+  
+  // Fallback a la configuración manual o localStorage
+  return manualMode === 'firebase' && isFirebaseAvailable ? 'firebase' : 'local';
 }
 
 // Obtener configuración actual de storage

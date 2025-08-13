@@ -993,13 +993,39 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 // === FUNCIONES FIREBASE PARA GALERÍA ===
 async function cargarImagenesGaleriaDesdeFirebase() {
-  // Detectar si estamos en modo local (solo desarrollo local)
-  const isLocalMode = window.location.protocol === 'file:' || 
-                      window.location.hostname === 'localhost' || 
-                      window.location.hostname === '127.0.0.1' ||
-                      !database;
+  // Usar configuración desde config.js
+  const storageConfig = getStorageConfig ? getStorageConfig() : { mode: 'local' };
+  const useFirebaseMode = storageConfig.mode === 'firebase';
   
-  if (isLocalMode) {
+  if (useFirebaseMode && database) {
+    // Modo Firebase: cargar desde Firebase Database
+    try {
+      const snap = await database.ref('galeria').once('value');
+      const data = snap.val();
+      if (data) {
+        galeriaImagenes = Object.values(data);
+        console.log('✅ (load) Imágenes desde Firebase:', galeriaImagenes.length);
+      } else {
+        console.log('ℹ️ (load) No hay imágenes en Firebase');
+        galeriaImagenes = [];
+      }
+    } catch (err) {
+      console.error('❌ cargarImagenesGaleriaDesdeFirebase:', err);
+      // Fallback a localStorage si Firebase falla
+      try {
+        const stored = localStorage.getItem('galeriaImagenes');
+        if (stored) {
+          galeriaImagenes = JSON.parse(stored);
+          console.log('✅ (fallback) Imágenes desde localStorage:', galeriaImagenes.length);
+        } else {
+          galeriaImagenes = [];
+        }
+      } catch (localErr) {
+        console.error('❌ Error en fallback localStorage:', localErr);
+        galeriaImagenes = [];
+      }
+    }
+  } else {
     // Modo local: cargar desde localStorage
     try {
       const stored = localStorage.getItem('galeriaImagenes');
@@ -1012,35 +1038,6 @@ async function cargarImagenesGaleriaDesdeFirebase() {
       }
     } catch (err) {
       console.error('❌ Error cargando desde localStorage:', err);
-      galeriaImagenes = [];
-    }
-    return;
-  }
-  
-  // Modo producción: cargar desde Firebase
-  try {
-    const snap = await database.ref('galeria').once('value');
-    const data = snap.val();
-    if (data) {
-      galeriaImagenes = Object.values(data);
-      console.log('✅ (load) Imágenes galería:', galeriaImagenes.length);
-    } else {
-      console.log('ℹ️ (load) No hay imágenes en la galería');
-      galeriaImagenes = [];
-    }
-  } catch (err) {
-    console.error('❌ cargarImagenesGaleriaDesdeFirebase:', err);
-    // Fallback a localStorage si Firebase falla
-    try {
-      const stored = localStorage.getItem('galeriaImagenes');
-      if (stored) {
-        galeriaImagenes = JSON.parse(stored);
-        console.log('✅ (fallback) Imágenes desde localStorage:', galeriaImagenes.length);
-      } else {
-        galeriaImagenes = [];
-      }
-    } catch (localErr) {
-      console.error('❌ Error en fallback localStorage:', localErr);
       galeriaImagenes = [];
     }
   }
@@ -1122,39 +1119,32 @@ async function subirArchivos(files) {
   let completados = 0;
   
   try {
-    // CONFIGURACIÓN: Cambiar a false para usar Firebase Storage
-    const useLocalMode = false; // ⚠️ CAMBIADO: true = localStorage, false = Firebase
+    // Usar configuración desde config.js
+    const storageConfig = getStorageConfig ? getStorageConfig() : { mode: 'local' };
+    const useFirebaseMode = storageConfig.mode === 'firebase';
     
-    // También detectar automáticamente
-    const isLocalDev = window.location.protocol === 'file:' || 
-                       window.location.hostname === 'localhost' || 
-                       window.location.hostname === '127.0.0.1';
-                       // Removido GitHub Pages para permitir Firebase en producción
+    console.log('📦 Modo de almacenamiento detectado:', storageConfig.mode);
     
-    if (useLocalMode || isLocalDev || !storage) {
-      // Modo desarrollo/local: usar URLs de archivos locales
-      console.log('🔧 Usando modo local para almacenamiento');
-      await subirArchivosLocal(files, progressFill, progressText, nuevasImagenes, completados);
-    } else {
-      // Modo producción: usar Firebase Storage
+    if (useFirebaseMode && storage && database) {
+      // Modo Firebase: usar Firebase Storage
       console.log('☁️ Usando Firebase Storage');
       await subirArchivosFirebase(files, progressFill, progressText, nuevasImagenes, completados);
+    } else {
+      // Modo local: usar URLs de archivos locales
+      console.log('💾 Usando almacenamiento local');
+      await subirArchivosLocal(files, progressFill, progressText, nuevasImagenes, completados);
     }
     
     // Agregar imágenes al array global
     galeriaImagenes.push(...nuevasImagenes);
     
-    // Guardar en localStorage para persistencia
-    localStorage.setItem('galeriaImagenes', JSON.stringify(galeriaImagenes));
-    
-    // Intentar guardar en Firebase Database si está disponible (opcional)
-    if (database) {
-      try {
-        await guardarImagenesGaleriaEnFirebase();
-        console.log('✅ También guardado en Firebase Database');
-      } catch (err) {
-        console.warn('⚠️ No se pudo guardar en Firebase Database (continuando con localStorage)');
-      }
+    // Guardar según el modo configurado
+    if (useFirebaseMode && database) {
+      await guardarImagenesGaleriaEnFirebase();
+      console.log('✅ Guardado en Firebase Database');
+    } else {
+      localStorage.setItem('galeriaImagenes', JSON.stringify(galeriaImagenes));
+      console.log('✅ Guardado en localStorage');
     }
     
     progressText.textContent = `✅ ${nuevasImagenes.length} imagen(es) subida(s)`;
@@ -1375,11 +1365,15 @@ async function eliminarImagen(imageId) {
       galeriaImagenes.splice(index, 1);
     }
     
-    // Guardar cambios
-    if (database) {
+    // Guardar cambios según configuración
+    const storageConfig = getStorageConfig ? getStorageConfig() : { mode: 'local' };
+    
+    if (storageConfig.mode === 'firebase' && database) {
       await guardarImagenesGaleriaEnFirebase();
+      console.log('✅ Cambios guardados en Firebase');
     } else {
       localStorage.setItem('galeriaImagenes', JSON.stringify(galeriaImagenes));
+      console.log('✅ Cambios guardados en localStorage');
     }
     
     // Actualizar vistas

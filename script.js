@@ -12,19 +12,22 @@ const firebaseConfig = {
 };
 
 // Inicializar Firebase
-let database;
+let database, storage;
 try {
   if (typeof firebase !== 'undefined') {
     firebase.initializeApp(firebaseConfig);
     database = firebase.database();
+    storage = firebase.storage();
     console.log('🔥 Firebase inicializado correctamente');
   } else {
     console.warn('⚠️ Firebase no está disponible, usando modo local');
     database = null;
+    storage = null;
   }
 } catch (error) {
   console.error('❌ Error al inicializar Firebase:', error);
   database = null;
+  storage = null;
 }
 
 // Confirmación de reserva y armado de mensaje para WhatsApp
@@ -240,6 +243,18 @@ function showAdminTab(tabName) {
       mostrarReservasDisponibles();
     }
   }
+  
+  // Si se selecciona la pestaña de galería, mostrar imágenes
+  if (tabName === 'galeria-tab') {
+    if (!datosListos) {
+      const grid = document.getElementById('admin-images-grid');
+      if (grid) {
+        grid.innerHTML = '<div class="no-images"><p>⏳ Cargando datos...</p></div>';
+      }
+    } else {
+      mostrarImagenesAdmin();
+    }
+  }
 }
 
 // === VARIABLES GLOBALES (declaradas temprano para evitar TDZ) ===
@@ -247,6 +262,8 @@ let fechaActual = new Date();
 let horariosGuardados = {}; // horarios por fecha
 let reservasOcupadas = {}; // reservas por slot
 let datosListos = false; // nuevo flag
+let galeriaImagenes = []; // Array para almacenar imágenes de la galería
+let currentSlide = 0; // Índice actual del carrusel
 console.log('[INIT] Variables globales declaradas.');
 
 // ===== FUNCIONES FIREBASE (añadidas) =====
@@ -322,6 +339,7 @@ async function inicializarDatos() {
   console.log('🚀 inicializarDatos()');
   await cargarHorariosDesdeFirebase();
   await cargarReservasDesdeFirebase();
+  await cargarImagenesGaleriaDesdeFirebase();
   await limpiarDatosAntiguos();
   datosListos = true; // marcar listo
   console.log('✅ Datos listos');
@@ -330,6 +348,13 @@ async function inicializarDatos() {
   if (reservasTab && reservasTab.style.display !== 'none') {
     mostrarReservasDisponibles();
   }
+  // Si el tab de galería está visible, refrescar
+  const galeriaTab = document.getElementById('galeria-tab');
+  if (galeriaTab && galeriaTab.style.display !== 'none') {
+    mostrarImagenesAdmin();
+  }
+  // Actualizar galería del cliente
+  actualizarGaleriaCliente();
 }
 
 // ===== SISTEMA DE CALENDARIO PARA HORARIOS =====
@@ -952,3 +977,408 @@ document.addEventListener('DOMContentLoaded', async function() {
   console.log('✅ Sistema completo inicializado correctamente');
 });
 // --- FIN INICIO DE SESIÓN ADMIN ---
+
+// ===== SISTEMA DE GALERÍA =====
+
+// === FUNCIONES FIREBASE PARA GALERÍA ===
+async function cargarImagenesGaleriaDesdeFirebase() {
+  if (!database) return;
+  try {
+    const snap = await database.ref('galeria').once('value');
+    const data = snap.val();
+    if (data) {
+      galeriaImagenes = Object.values(data);
+      console.log('✅ (load) Imágenes galería:', galeriaImagenes.length);
+    } else {
+      console.log('ℹ️ (load) No hay imágenes en la galería');
+      galeriaImagenes = [];
+    }
+  } catch (err) {
+    console.error('❌ cargarImagenesGaleriaDesdeFirebase:', err);
+    galeriaImagenes = [];
+  }
+}
+
+async function guardarImagenesGaleriaEnFirebase() {
+  if (!database) { 
+    console.warn('⚠️ Firebase no inicializado'); 
+    return false; 
+  }
+  try {
+    const galeriaObj = {};
+    galeriaImagenes.forEach((img, index) => {
+      galeriaObj[`img_${index}`] = img;
+    });
+    await database.ref('galeria').set(galeriaObj);
+    console.log('✅ (save) Imágenes galería escritas');
+    return true;
+  } catch (err) {
+    console.error('❌ guardarImagenesGaleriaEnFirebase:', err);
+    return false;
+  }
+}
+
+// === FUNCIONES PARA ADMINISTRADOR ===
+function configurarEventosGaleria() {
+  const uploadArea = document.getElementById('upload-area');
+  const fileInput = document.getElementById('file-input');
+  
+  if (!uploadArea || !fileInput) return;
+  
+  // Evento click en área de carga
+  uploadArea.addEventListener('click', () => {
+    fileInput.click();
+  });
+  
+  // Evento change en input de archivo
+  fileInput.addEventListener('change', (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length > 0) {
+      subirArchivos(files);
+    }
+  });
+  
+  // Eventos drag and drop
+  uploadArea.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    uploadArea.classList.add('dragover');
+  });
+  
+  uploadArea.addEventListener('dragleave', () => {
+    uploadArea.classList.remove('dragover');
+  });
+  
+  uploadArea.addEventListener('drop', (e) => {
+    e.preventDefault();
+    uploadArea.classList.remove('dragover');
+    
+    const files = Array.from(e.dataTransfer.files).filter(file => 
+      file.type.startsWith('image/')
+    );
+    
+    if (files.length > 0) {
+      subirArchivos(files);
+    }
+  });
+}
+
+async function subirArchivos(files) {
+  const progressBar = document.getElementById('upload-progress');
+  const progressFill = document.getElementById('progress-fill');
+  const progressText = document.getElementById('progress-text');
+  
+  if (!storage) {
+    alert('❌ Sistema de almacenamiento no disponible. Verifica la conexión.');
+    return;
+  }
+  
+  progressBar.style.display = 'block';
+  progressFill.style.width = '0%';
+  progressText.textContent = 'Preparando subida...';
+  
+  const nuevasImagenes = [];
+  let completados = 0;
+  
+  try {
+    for (const file of files) {
+      // Validar archivo
+      if (!file.type.startsWith('image/')) {
+        console.warn(`⚠️ Archivo ignorado (no es imagen): ${file.name}`);
+        completados++;
+        continue;
+      }
+      
+      if (file.size > 5 * 1024 * 1024) { // 5MB
+        alert(`❌ ${file.name} es muy grande (máx. 5MB)`);
+        completados++;
+        continue;
+      }
+      
+      // Generar nombre único
+      const timestamp = Date.now();
+      const extension = file.name.split('.').pop();
+      const nombreArchivo = `galeria_${timestamp}_${Math.random().toString(36).substr(2, 9)}.${extension}`;
+      
+      // Subir a Firebase Storage
+      progressText.textContent = `Subiendo ${file.name}...`;
+      
+      const storageRef = storage.ref(`galeria/${nombreArchivo}`);
+      
+      const uploadTask = storageRef.put(file);
+      
+      await new Promise((resolve, reject) => {
+        uploadTask.on('state_changed',
+          (snapshot) => {
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            const progressTotal = ((completados + (progress/100)) / files.length) * 100;
+            progressFill.style.width = `${progressTotal}%`;
+          },
+          (error) => {
+            console.error('❌ Error subida:', error);
+            reject(error);
+          },
+          async () => {
+            try {
+              const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
+              
+              const nuevaImagen = {
+                id: `img_${timestamp}_${Math.random().toString(36).substr(2, 9)}`,
+                nombre: file.name,
+                nombreArchivo: nombreArchivo,
+                url: downloadURL,
+                fechaSubida: new Date().toISOString(),
+                tamaño: file.size
+              };
+              
+              nuevasImagenes.push(nuevaImagen);
+              completados++;
+              
+              const progressTotal = (completados / files.length) * 100;
+              progressFill.style.width = `${progressTotal}%`;
+              
+              resolve();
+            } catch (error) {
+              reject(error);
+            }
+          }
+        );
+      });
+    }
+    
+    // Agregar imágenes al array global
+    galeriaImagenes.push(...nuevasImagenes);
+    
+    // Guardar en Firebase Database
+    await guardarImagenesGaleriaEnFirebase();
+    
+    progressText.textContent = `✅ ${nuevasImagenes.length} imagen(es) subida(s)`;
+    
+    // Actualizar vistas
+    mostrarImagenesAdmin();
+    actualizarGaleriaCliente();
+    
+    // Limpiar input
+    const fileInput = document.getElementById('file-input');
+    if (fileInput) fileInput.value = '';
+    
+    setTimeout(() => {
+      progressBar.style.display = 'none';
+    }, 2000);
+    
+  } catch (error) {
+    console.error('❌ Error en subida:', error);
+    progressText.textContent = '❌ Error en la subida';
+    alert('Error al subir las imágenes. Inténtalo de nuevo.');
+    
+    setTimeout(() => {
+      progressBar.style.display = 'none';
+    }, 3000);
+  }
+}
+
+function mostrarImagenesAdmin() {
+  const grid = document.getElementById('admin-images-grid');
+  const stats = document.getElementById('gallery-stats');
+  
+  if (!grid || !stats) return;
+  
+  // Actualizar estadísticas
+  const imageCount = galeriaImagenes.length;
+  stats.innerHTML = `<span class="image-count">${imageCount} imagen${imageCount !== 1 ? 'es' : ''}</span>`;
+  
+  if (imageCount === 0) {
+    grid.innerHTML = `
+      <div class="no-images">
+        <p>📷 No hay imágenes en la galería aún</p>
+        <p>Sube algunas fotos para comenzar</p>
+      </div>
+    `;
+    return;
+  }
+  
+  // Mostrar imágenes
+  const imagenesHTML = galeriaImagenes.map(img => `
+    <div class="image-item" data-id="${img.id}">
+      <img src="${img.url}" alt="${img.nombre}" loading="lazy">
+      <div class="image-actions">
+        <button class="action-btn delete-btn" onclick="eliminarImagen('${img.id}')" title="Eliminar">
+          🗑️
+        </button>
+      </div>
+      <div class="image-info">
+        <p class="image-name">${img.nombre}</p>
+        <p class="image-size">${formatearTamaño(img.tamaño)}</p>
+      </div>
+    </div>
+  `).join('');
+  
+  grid.innerHTML = imagenesHTML;
+}
+
+async function eliminarImagen(imageId) {
+  const imagen = galeriaImagenes.find(img => img.id === imageId);
+  if (!imagen) return;
+  
+  const confirmar = confirm(`¿Eliminar "${imagen.nombre}"?`);
+  if (!confirmar) return;
+  
+  try {
+    // Eliminar de Firebase Storage
+    if (storage) {
+      const storageRef = storage.ref(`galeria/${imagen.nombreArchivo}`);
+      await storageRef.delete();
+      console.log('✅ Imagen eliminada de Storage');
+    }
+    
+    // Eliminar del array local
+    const index = galeriaImagenes.findIndex(img => img.id === imageId);
+    if (index > -1) {
+      galeriaImagenes.splice(index, 1);
+    }
+    
+    // Actualizar Firebase Database
+    await guardarImagenesGaleriaEnFirebase();
+    
+    // Actualizar vistas
+    mostrarImagenesAdmin();
+    actualizarGaleriaCliente();
+    
+    console.log('✅ Imagen eliminada completamente');
+    
+  } catch (error) {
+    console.error('❌ Error al eliminar imagen:', error);
+    alert('Error al eliminar la imagen. Inténtalo de nuevo.');
+  }
+}
+
+function formatearTamaño(bytes) {
+  if (bytes === 0) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+}
+
+// === FUNCIONES PARA CLIENTE (CARRUSEL) ===
+function actualizarGaleriaCliente() {
+  const noImages = document.getElementById('no-gallery-images');
+  const carouselWrapper = document.getElementById('carousel-wrapper');
+  
+  if (!noImages || !carouselWrapper) return;
+  
+  if (galeriaImagenes.length === 0) {
+    noImages.style.display = 'block';
+    carouselWrapper.style.display = 'none';
+    return;
+  }
+  
+  noImages.style.display = 'none';
+  carouselWrapper.style.display = 'block';
+  
+  generarCarrusel();
+}
+
+function generarCarrusel() {
+  const track = document.getElementById('carousel-track');
+  const indicators = document.getElementById('carousel-indicators');
+  
+  if (!track || !indicators || galeriaImagenes.length === 0) return;
+  
+  // Generar slides
+  const slidesHTML = galeriaImagenes.map((img, index) => `
+    <div class="carousel-slide" data-index="${index}">
+      <img src="${img.url}" alt="${img.nombre}" loading="lazy">
+    </div>
+  `).join('');
+  
+  track.innerHTML = slidesHTML;
+  
+  // Generar indicadores
+  const indicatorsHTML = galeriaImagenes.map((_, index) => `
+    <div class="carousel-indicator ${index === 0 ? 'active' : ''}" 
+         onclick="goToSlide(${index})"></div>
+  `).join('');
+  
+  indicators.innerHTML = indicatorsHTML;
+  
+  // Resetear posición
+  currentSlide = 0;
+  updateCarouselPosition();
+  
+  // Auto-play del carrusel
+  iniciarAutoPlay();
+}
+
+function moveCarousel(direction) {
+  const totalSlides = galeriaImagenes.length;
+  if (totalSlides === 0) return;
+  
+  currentSlide += direction;
+  
+  if (currentSlide >= totalSlides) {
+    currentSlide = 0;
+  } else if (currentSlide < 0) {
+    currentSlide = totalSlides - 1;
+  }
+  
+  updateCarouselPosition();
+  updateIndicators();
+  
+  // Reiniciar auto-play
+  clearInterval(window.carouselInterval);
+  iniciarAutoPlay();
+}
+
+function goToSlide(index) {
+  if (index < 0 || index >= galeriaImagenes.length) return;
+  
+  currentSlide = index;
+  updateCarouselPosition();
+  updateIndicators();
+  
+  // Reiniciar auto-play
+  clearInterval(window.carouselInterval);
+  iniciarAutoPlay();
+}
+
+function updateCarouselPosition() {
+  const track = document.getElementById('carousel-track');
+  if (!track) return;
+  
+  const translateX = -currentSlide * 100;
+  track.style.transform = `translateX(${translateX}%)`;
+}
+
+function updateIndicators() {
+  const indicators = document.querySelectorAll('.carousel-indicator');
+  indicators.forEach((indicator, index) => {
+    indicator.classList.toggle('active', index === currentSlide);
+  });
+}
+
+function iniciarAutoPlay() {
+  if (galeriaImagenes.length <= 1) return;
+  
+  clearInterval(window.carouselInterval);
+  
+  window.carouselInterval = setInterval(() => {
+    moveCarousel(1);
+  }, 5000); // Cambiar cada 5 segundos
+}
+
+// === INICIALIZACIÓN DE EVENTOS ===
+document.addEventListener('DOMContentLoaded', function() {
+  // Configurar eventos de galería cuando el DOM esté listo
+  setTimeout(() => {
+    configurarEventosGaleria();
+  }, 100);
+  
+  // Pausar auto-play cuando la pestaña no está visible
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      clearInterval(window.carouselInterval);
+    } else if (galeriaImagenes.length > 1) {
+      iniciarAutoPlay();
+    }
+  });
+});

@@ -10,6 +10,7 @@
  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 
   <script src="script.js" defer></script>
 </head>
@@ -137,7 +138,43 @@
         </div>
       </div>
     </section>
-    <section id="galeria"><h2>Galería</h2><p>Próximamente fotos de nuestros estilos.</p></section>
+    <section id="galeria">
+      <h2>Galería</h2>
+      <p>Descubre nuestros mejores trabajos y estilos.</p>
+      
+      <!-- Carrusel de imágenes -->
+      <div class="gallery-carousel-container">
+        <div class="gallery-carousel" id="gallery-carousel">
+          <div class="no-gallery-images" id="no-gallery-images">
+            <div class="no-images-message">
+              <span class="gallery-icon">📷</span>
+              <h3>Galería en construcción</h3>
+              <p>Pronto podrás ver aquí nuestros mejores trabajos y estilos.</p>
+            </div>
+          </div>
+          
+          <!-- Las imágenes se cargarán dinámicamente aquí -->
+          <div class="carousel-wrapper" id="carousel-wrapper" style="display:none;">
+            <div class="carousel-track" id="carousel-track">
+              <!-- Imágenes dinámicas -->
+            </div>
+            
+            <!-- Controles del carrusel -->
+            <button class="carousel-control prev" id="carousel-prev" onclick="moveCarousel(-1)">
+              <span>‹</span>
+            </button>
+            <button class="carousel-control next" id="carousel-next" onclick="moveCarousel(1)">
+              <span>›</span>
+            </button>
+            
+            <!-- Indicadores -->
+            <div class="carousel-indicators" id="carousel-indicators">
+              <!-- Puntos indicadores se generan dinámicamente -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
 
   <!-- Modal de inicio de sesión -->
@@ -222,9 +259,44 @@
       <!-- Pestaña Galería -->
       <div id="galeria-tab" class="admin-tab-content" style="display:none;">
         <h2>Gestionar Galería</h2>
-        <p>Aquí podrás subir y administrar las fotos de la galería del estudio.</p>
-        <div class="coming-soon">
-          <p>🖼️ Funcionalidad en desarrollo...</p>
+        <p>Sube y administra las fotos que aparecerán en la galería del cliente.</p>
+        
+        <!-- Controles de carga -->
+        <div class="galeria-controles">
+          <div class="upload-section">
+            <h3>📸 Subir Nuevas Imágenes</h3>
+            <div class="upload-area" id="upload-area">
+              <div class="upload-content">
+                <span class="upload-icon">📷</span>
+                <p>Haz clic aquí o arrastra las imágenes</p>
+                <small>Formatos: JPG, PNG, WebP (máx. 5MB c/u)</small>
+              </div>
+              <input type="file" id="file-input" accept=".jpg,.jpeg,.png,.webp" multiple hidden>
+            </div>
+            <div class="upload-progress" id="upload-progress" style="display:none;">
+              <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+              </div>
+              <div class="progress-text" id="progress-text">Subiendo...</div>
+            </div>
+          </div>
+          
+          <!-- Vista previa y gestión -->
+          <div class="preview-section">
+            <div class="section-header">
+              <h3>🖼️ Imágenes de la Galería</h3>
+              <div class="gallery-stats" id="gallery-stats">
+                <span class="image-count">0 imágenes</span>
+              </div>
+            </div>
+            
+            <div class="images-grid" id="admin-images-grid">
+              <div class="no-images">
+                <p>📷 No hay imágenes en la galería aún</p>
+                <p>Sube algunas fotos para comenzar</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

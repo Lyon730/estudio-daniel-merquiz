@@ -993,11 +993,10 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 // === FUNCIONES FIREBASE PARA GALERÍA ===
 async function cargarImagenesGaleriaDesdeFirebase() {
-  // Detectar si estamos en modo local (incluye GitHub Pages por ahora)
+  // Detectar si estamos en modo local (solo desarrollo local)
   const isLocalMode = window.location.protocol === 'file:' || 
                       window.location.hostname === 'localhost' || 
                       window.location.hostname === '127.0.0.1' ||
-                      window.location.hostname.includes('github.io') || 
                       !database;
   
   if (isLocalMode) {
@@ -1123,14 +1122,14 @@ async function subirArchivos(files) {
   let completados = 0;
   
   try {
-    // Forzar modo local mientras solucionamos Firebase Storage
-    const useLocalMode = true; // Cambiar a false cuando Firebase esté configurado
+    // CONFIGURACIÓN: Cambiar a false para usar Firebase Storage
+    const useLocalMode = false; // ⚠️ CAMBIADO: true = localStorage, false = Firebase
     
     // También detectar automáticamente
     const isLocalDev = window.location.protocol === 'file:' || 
                        window.location.hostname === 'localhost' || 
-                       window.location.hostname === '127.0.0.1' ||
-                       window.location.hostname.includes('github.io'); // GitHub Pages
+                       window.location.hostname === '127.0.0.1';
+                       // Removido GitHub Pages para permitir Firebase en producción
     
     if (useLocalMode || isLocalDev || !storage) {
       // Modo desarrollo/local: usar URLs de archivos locales

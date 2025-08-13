@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración Firebase - Estudio Daniel Merquiz</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .config-container {
+            max-width: 800px;
+            margin: 20px auto;
+            background: rgba(245, 245, 220, 0.05);
+            border-radius: 12px;
+            padding: 30px;
+            border: 1px solid rgba(245, 245, 220, 0.1);
+        }
+        
+        .config-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(245, 245, 220, 0.02);
+            border-radius: 8px;
+            border-left: 4px solid #4CAF50;
+        }
+        
+        .config-section h3 {
+            margin-top: 0;
+            color: #4CAF50;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        
+        .status-ok { background: rgba(76, 175, 80, 0.2); color: #4CAF50; }
+        .status-error { background: rgba(244, 67, 54, 0.2); color: #f44336; }
+        .status-warning { background: rgba(255, 152, 0, 0.2); color: #ff9800; }
+        
+        .config-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            background: rgba(245, 245, 220, 0.05);
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #4CAF50;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        .test-button {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        .test-button:hover {
+            background: #1976D2;
+        }
+        
+        .code-block {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 14px;
+            color: #f5f5dc;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        
+        .back-link {
+            display: inline-block;
+            background: #666;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        
+        .back-link:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="config-container">
+        <a href="index.html" class="back-link">← Volver a la Aplicación</a>
+        
+        <h1>⚙️ Configuración de Firebase Storage</h1>
+        <p>Configura aquí el almacenamiento de imágenes para la galería</p>
+        
+        <!-- Estado actual -->
+        <div class="config-section">
+            <h3>📊 Estado Actual</h3>
+            <div id="current-status">
+                <p>🔄 Verificando configuración...</p>
+            </div>
+        </div>
+        
+        <!-- Configuración de almacenamiento -->
+        <div class="config-section">
+            <h3>💾 Modo de Almacenamiento</h3>
+            
+            <div class="config-option">
+                <div>
+                    <strong>Usar Firebase Storage</strong>
+                    <br><small>Almacenamiento permanente en la nube</small>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="firebase-toggle" onchange="toggleFirebaseMode()">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            
+            <div class="config-option">
+                <div>
+                    <strong>Usar Almacenamiento Local</strong>
+                    <br><small>Almacenamiento temporal en el navegador</small>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="local-toggle" checked onchange="toggleLocalMode()">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+        
+        <!-- Tests de conectividad -->
+        <div class="config-section">
+            <h3>🧪 Tests de Conectividad</h3>
+            
+            <button class="test-button" onclick="testFirebaseConnection()">
+                🔥 Probar Firebase
+            </button>
+            
+            <button class="test-button" onclick="testLocalStorage()">
+                💾 Probar localStorage
+            </button>
+            
+            <button class="test-button" onclick="testImageUpload()">
+                📸 Probar Subida de Imagen
+            </button>
+            
+            <div id="test-results" style="margin-top: 20px;">
+                <!-- Resultados de tests aparecerán aquí -->
+            </div>
+        </div>
+        
+        <!-- Instrucciones de configuración -->
+        <div class="config-section">
+            <h3>📋 Configuración de Firebase Storage</h3>
+            
+            <h4>Paso 1: Habilitar Storage en Firebase Console</h4>
+            <p>1. Ve a <a href="https://console.firebase.google.com/" target="_blank">Firebase Console</a></p>
+            <p>2. Selecciona tu proyecto: <strong>estudio-daniel-merquiz</strong></p>
+            <p>3. En el menú lateral, busca <strong>"Storage"</strong></p>
+            <p>4. Haz clic en <strong>"Comenzar"</strong></p>
+            <p>5. Selecciona <strong>"Modo de prueba"</strong> para empezar</p>
+            
+            <h4>Paso 2: Configurar las Reglas de Storage</h4>
+            <p>En Firebase Console > Storage > Rules, pega estas reglas:</p>
+            
+            <div class="code-block">rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /galeria/{allPaths=**} {
+      allow read: if true; // Cualquiera puede leer
+      allow write: if true; // ⚠️ Solo para testing - cambiar en producción
+    }
+  }
+}</div>
+            
+            <h4>Paso 3: Para Producción (Más Seguro)</h4>
+            <div class="code-block">rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /galeria/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null; // Solo usuarios autenticados
+    }
+  }
+}</div>
+            
+            <h4>Paso 4: Activar en la Aplicación</h4>
+            <p>Una vez configurado Firebase Storage, activa el interruptor arriba para usar Firebase.</p>
+        </div>
+        
+        <!-- Información técnica -->
+        <div class="config-section">
+            <h3>🔧 Información Técnica</h3>
+            <div id="technical-info">
+                <!-- Información técnica aparecerá aquí -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
+    <script src="config.js"></script>
+    
+    <script>
+        // Configuración de Firebase (copiada del archivo principal)
+        const firebaseConfig = {
+            apiKey: "AIzaSyCqix70kqE3MPh_lwz0uolGECT1MerteUU",
+            authDomain: "estudio-daniel-merquiz.firebaseapp.com",
+            databaseURL: "https://estudio-daniel-merquiz-default-rtdb.firebaseio.com",
+            projectId: "estudio-daniel-merquiz",
+            storageBucket: "estudio-daniel-merquiz.appspot.com",
+            messagingSenderId: "876381250367",
+            appId: "1:876381250367:web:90c685ecce6312b362a98a",
+            measurementId: "G-LP5VVC2WS7"
+        };
+        
+        // Inicializar Firebase
+        let database, storage;
+        try {
+            firebase.initializeApp(firebaseConfig);
+            database = firebase.database();
+            storage = firebase.storage();
+            window.database = database;
+            window.storage = storage;
+        } catch (error) {
+            console.error('Error Firebase:', error);
+        }
+        
+        // Cargar estado inicial
+        window.onload = function() {
+            updateCurrentStatus();
+            updateTechnicalInfo();
+            loadCurrentConfig();
+        };
+        
+        function updateCurrentStatus() {
+            const statusDiv = document.getElementById('current-status');
+            const storageConfig = getStorageConfig();
+            
+            let firebaseStatus = '❌';
+            let localStatus = '❌';
+            
+            if (typeof firebase !== 'undefined' && database && storage) {
+                firebaseStatus = '✅';
+            }
+            
+            try {
+                localStorage.setItem('test', 'ok');
+                localStorage.removeItem('test');
+                localStatus = '✅';
+            } catch (e) {}
+            
+            statusDiv.innerHTML = `
+                <p><strong>🔥 Firebase:</strong> ${firebaseStatus} ${firebaseStatus === '✅' ? 'Disponible' : 'No disponible'}</p>
+                <p><strong>💾 localStorage:</strong> ${localStatus} ${localStatus === '✅' ? 'Disponible' : 'No disponible'}</p>
+                <p><strong>📦 Modo actual:</strong> <span class="status-indicator status-${storageConfig.isFirebase ? 'ok' : 'warning'}">${storageConfig.mode}</span></p>
+                <p><strong>🌐 Entorno:</strong> ${window.location.hostname || 'Local'}</p>
+            `;
+        }
+        
+        function updateTechnicalInfo() {
+            const techDiv = document.getElementById('technical-info');
+            
+            techDiv.innerHTML = `
+                <p><strong>URL actual:</strong> ${window.location.href}</p>
+                <p><strong>Protocolo:</strong> ${window.location.protocol}</p>
+                <p><strong>Hostname:</strong> ${window.location.hostname || 'N/A'}</p>
+                <p><strong>Firebase SDK:</strong> ${typeof firebase !== 'undefined' ? 'Cargado' : 'No cargado'}</p>
+                <p><strong>Storage bucket:</strong> ${firebaseConfig.storageBucket}</p>
+                <p><strong>Project ID:</strong> ${firebaseConfig.projectId}</p>
+            `;
+        }
+        
+        function loadCurrentConfig() {
+            const currentMode = APP_CONFIG.storage.mode;
+            
+            document.getElementById('firebase-toggle').checked = currentMode === 'firebase';
+            document.getElementById('local-toggle').checked = currentMode === 'local';
+        }
+        
+        function toggleFirebaseMode() {
+            const isChecked = document.getElementById('firebase-toggle').checked;
+            
+            if (isChecked) {
+                document.getElementById('local-toggle').checked = false;
+                APP_CONFIG.storage.mode = 'firebase';
+                localStorage.setItem('storageMode', 'firebase');
+            } else {
+                document.getElementById('local-toggle').checked = true;
+                APP_CONFIG.storage.mode = 'local';
+                localStorage.setItem('storageMode', 'local');
+            }
+            
+            updateCurrentStatus();
+        }
+        
+        function toggleLocalMode() {
+            const isChecked = document.getElementById('local-toggle').checked;
+            
+            if (isChecked) {
+                document.getElementById('firebase-toggle').checked = false;
+                APP_CONFIG.storage.mode = 'local';
+                localStorage.setItem('storageMode', 'local');
+            } else {
+                document.getElementById('firebase-toggle').checked = true;
+                APP_CONFIG.storage.mode = 'firebase';
+                localStorage.setItem('storageMode', 'firebase');
+            }
+            
+            updateCurrentStatus();
+        }
+        
+        async function testFirebaseConnection() {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = '<p>🔄 Probando conexión a Firebase...</p>';
+            
+            try {
+                if (!database || !storage) {
+                    throw new Error('Firebase no inicializado');
+                }
+                
+                // Test Database
+                const testRef = database.ref('test');
+                await testRef.set({ timestamp: Date.now() });
+                const snapshot = await testRef.once('value');
+                
+                if (!snapshot.exists()) {
+                    throw new Error('No se pudo escribir/leer en Database');
+                }
+                
+                // Test Storage (intentar obtener metadatos)
+                const storageRef = storage.ref('test/test.txt');
+                
+                resultsDiv.innerHTML = `
+                    <div class="status-indicator status-ok">✅ Firebase funciona correctamente</div>
+                    <p>• Database: Conexión OK</p>
+                    <p>• Storage: Disponible</p>
+                `;
+                
+                // Limpiar test
+                await testRef.remove();
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="status-indicator status-error">❌ Error en Firebase</div>
+                    <p>Error: ${error.message}</p>
+                    <small>Verifica que Firebase Storage esté habilitado y las reglas configuradas.</small>
+                `;
+            }
+        }
+        
+        function testLocalStorage() {
+            const resultsDiv = document.getElementById('test-results');
+            
+            try {
+                const testData = { test: 'ok', timestamp: Date.now() };
+                localStorage.setItem('testConfig', JSON.stringify(testData));
+                
+                const retrieved = JSON.parse(localStorage.getItem('testConfig'));
+                
+                if (retrieved.test !== 'ok') {
+                    throw new Error('Datos corruptos en localStorage');
+                }
+                
+                localStorage.removeItem('testConfig');
+                
+                resultsDiv.innerHTML = `
+                    <div class="status-indicator status-ok">✅ localStorage funciona correctamente</div>
+                    <p>• Escritura: OK</p>
+                    <p>• Lectura: OK</p>
+                    <p>• Eliminación: OK</p>
+                `;
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="status-indicator status-error">❌ Error en localStorage</div>
+                    <p>Error: ${error.message}</p>
+                `;
+            }
+        }
+        
+        function testImageUpload() {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = `
+                <p>📸 Para probar la subida de imágenes:</p>
+                <p>1. Ve a la <a href="index.html">aplicación principal</a></p>
+                <p>2. Inicia sesión como admin</p>
+                <p>3. Ve a "Gestionar Galería"</p>
+                <p>4. Sube una imagen de prueba</p>
+                <br>
+                <p>O usa la <a href="test-galeria.html">página de test</a> para probar sin login.</p>
+            `;
+        }
+    </script>
+</body>
+</html>

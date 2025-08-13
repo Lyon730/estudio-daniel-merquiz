@@ -6,7 +6,7 @@ const APP_CONFIG = {
   storage: {
     // Cambiar a 'firebase' para usar Firebase Storage
     // Cambiar a 'local' para usar localStorage
-    mode: 'local', // 'local' | 'firebase'
+    mode: 'firebase', // 'local' | 'firebase'
     
     // Configuración de Firebase
     firebase: {

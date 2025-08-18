@@ -6,18 +6,8 @@ service firebase.storage {
       // Permitir lectura a todos
       allow read: if true;
       
-      // Permitir escritura desde dominios autorizados
-      allow write: if request.auth == null && (
-        // Desarrollo local
-        request.headers['origin'] == null ||
-        // Dominios de producción
-        request.headers['origin'].matches('https://www\.estudiodanielmerquiz\.com') ||
-        request.headers['origin'].matches('https://estudiodanielmerquiz\.com') ||
-        // Netlify subdomains
-        request.headers['origin'].matches('https://.*\.netlify\.app') ||
-        // GitHub Pages (backup)
-        request.headers['origin'].matches('https://.*\.github\.io')
-      );
+      // Permitir escritura a todos (simplificado)
+      allow write: if true;
     }
   }
 }

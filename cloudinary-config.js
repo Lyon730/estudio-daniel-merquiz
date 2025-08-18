@@ -3,7 +3,7 @@
 const CLOUDINARY_CONFIG = {
   cloudName: 'dtwdfq2ht', // ← Reemplaza con tu Cloud Name de Cloudinary
   uploadPreset: 'estudio_galeria', // Crearemos este preset
-  folder: '', // Deshabilitado temporalmente para testing
+  folder: 'estudio-daniel-merquiz/galeria', // Reactivar folder
   
   // Configuraciones de upload
   maxFileSize: 5 * 1024 * 1024, // 5MB
@@ -112,12 +112,41 @@ function isCloudinaryConfigured() {
 // Función para obtener todas las imágenes de la galería desde Cloudinary
 async function getAllCloudinaryImages() {
   try {
-    console.log('🌤️ Sincronizando con Cloudinary...');
+    console.log('🌤️ Obteniendo imágenes desde Cloudinary API...');
     
-    // Para Cloudinary sin API key, usamos localStorage como fuente de verdad
-    // y solo agregamos las imágenes que se suban directamente
+    // Usar la API de búsqueda de Cloudinary (no requiere autenticación para recursos públicos)
+    const searchUrl = `https://res.cloudinary.com/${CLOUDINARY_CONFIG.cloudName}/image/list/galeria.json`;
     
-    // Cargar imágenes guardadas localmente que son de Cloudinary
+    try {
+      const response = await fetch(searchUrl);
+      if (response.ok) {
+        const data = await response.json();
+        const images = data.resources.map(resource => ({
+          id: resource.public_id,
+          nombre: resource.public_id.split('/').pop(),
+          url: `https://res.cloudinary.com/${CLOUDINARY_CONFIG.cloudName}/image/upload/${resource.public_id}`,
+          thumbnail: `https://res.cloudinary.com/${CLOUDINARY_CONFIG.cloudName}/image/upload/c_fill,w_300,h_200,q_auto/${resource.public_id}`,
+          gallery: `https://res.cloudinary.com/${CLOUDINARY_CONFIG.cloudName}/image/upload/c_limit,w_1200,h_800,q_auto/${resource.public_id}`,
+          tamaño: resource.bytes || 0,
+          tipo: 'cloudinary',
+          fechaSubida: resource.created_at || new Date().toISOString(),
+          cloudinary: {
+            publicId: resource.public_id,
+            format: resource.format || 'jpg',
+            width: resource.width || 800,
+            height: resource.height || 600,
+            bytes: resource.bytes || 0
+          }
+        }));
+        
+        console.log('✅ Obtenidas', images.length, 'imágenes desde Cloudinary API');
+        return images;
+      }
+    } catch (apiError) {
+      console.log('ℹ️ API de lista no disponible, usando método alternativo');
+    }
+    
+    // Método alternativo: usar localStorage pero sincronizar
     const stored = localStorage.getItem('galeriaImagenes');
     if (stored) {
       const allImages = JSON.parse(stored);
@@ -126,7 +155,7 @@ async function getAllCloudinaryImages() {
       return cloudinaryImages;
     }
     
-    console.log('ℹ️ No hay imágenes de Cloudinary en cache local');
+    console.log('ℹ️ No hay imágenes de Cloudinary disponibles');
     return [];
 
   } catch (error) {

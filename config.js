@@ -6,7 +6,7 @@ const APP_CONFIG = {
   storage: {
     // Cambiar a 'firebase' para usar Firebase Storage
     // Cambiar a 'local' para usar localStorage
-    mode: 'firebase', // 'local' | 'firebase'
+    mode: 'auto', // 'local' | 'firebase' | 'auto'
     
     // Configuración de Firebase
     firebase: {
@@ -70,30 +70,70 @@ function detectStorageMode() {
                      window.location.hostname === 'localhost' || 
                      window.location.hostname === '127.0.0.1';
   
+  const isGitHubPages = window.location.hostname.includes('github.io');
+  const isNetlify = window.location.hostname.includes('netlify.app') || 
+                   window.location.hostname.includes('.netlify.app');
+  const isVercel = window.location.hostname.includes('vercel.app');
+  const isFirebaseHosting = window.location.hostname.includes('.web.app') || 
+                           window.location.hostname.includes('.firebaseapp.com');
+  
   const isFirebaseAvailable = typeof firebase !== 'undefined' && 
                               window.database && 
                               window.storage;
   
-  // Si está en desarrollo local (file://), forzar localStorage
-  if (isLocalDev) {
-    console.log('🔧 Modo local detectado - usando localStorage');
+  // Modo manual específico
+  if (manualMode === 'local') {
+    console.log('🔧 Modo local forzado por configuración');
     return 'local';
   }
   
-  // Si Firebase está disponible y configurado manualmente como firebase
-  if (isFirebaseAvailable && manualMode === 'firebase') {
-    console.log('☁️ Modo Firebase activado');
+  if (manualMode === 'firebase' && isFirebaseAvailable) {
+    console.log('☁️ Modo Firebase forzado por configuración');
     return 'firebase';
   }
   
-  // Si Firebase no está disponible pero se configuró como firebase, avisar
-  if (manualMode === 'firebase' && !isFirebaseAvailable) {
-    console.warn('⚠️ Firebase configurado pero no disponible - usando localStorage');
-    return 'local';
+  // Modo automático
+  if (manualMode === 'auto') {
+    // En desarrollo local, usar localStorage
+    if (isLocalDev) {
+      console.log('🔧 Desarrollo local detectado - usando localStorage');
+      return 'local';
+    }
+    
+    // En hostings modernos, intentar Firebase si está disponible
+    if (isNetlify) {
+      if (isFirebaseAvailable) {
+        console.log('🌐 Netlify + Firebase detectado - usando Firebase Storage');
+        return 'firebase';
+      } else {
+        console.log('🌐 Netlify detectado - usando localStorage (Firebase no disponible)');
+        return 'local';
+      }
+    }
+    
+    if (isVercel || isFirebaseHosting) {
+      if (isFirebaseAvailable) {
+        console.log('☁️ Hosting compatible + Firebase detectado - usando Firebase Storage');
+        return 'firebase';
+      }
+    }
+    
+    // En GitHub Pages, usar localStorage para evitar CORS
+    if (isGitHubPages) {
+      console.log('📄 GitHub Pages detectado - usando localStorage (evita CORS)');
+      return 'local';
+    }
+    
+    // En otros entornos, usar Firebase si está disponible
+    if (isFirebaseAvailable) {
+      console.log('☁️ Firebase disponible - usando Firebase Storage');
+      return 'firebase';
+    }
   }
   
-  // Fallback a la configuración manual o localStorage
-  return manualMode === 'firebase' && isFirebaseAvailable ? 'firebase' : 'local';
+  // Fallback a localStorage
+  console.log('💾 Fallback a localStorage');
+  return 'local';
 }
 
 // Obtener configuración actual de storage

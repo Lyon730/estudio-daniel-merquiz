@@ -362,12 +362,48 @@ async function limpiarDatosAntiguos() {
 }
 async function inicializarDatos() {
   console.log('🚀 inicializarDatos()');
-  await cargarHorariosDesdeFirebase();
-  await cargarReservasDesdeFirebase();
-  await cargarImagenesGaleriaDesdeFirebase();
-  await limpiarDatosAntiguos();
+  
+  // Cargar datos con manejo de errores robusto
+  try {
+    await cargarHorariosDesdeFirebase();
+  } catch (error) {
+    console.error('⚠️ Error cargando horarios:', error);
+  }
+  
+  try {
+    await cargarReservasDesdeFirebase();
+  } catch (error) {
+    console.error('⚠️ Error cargando reservas:', error);
+  }
+  
+  try {
+    await cargarImagenesGaleriaDesdeFirebase();
+  } catch (error) {
+    console.error('⚠️ Error cargando galería:', error);
+    // Fallback a localStorage en caso de error
+    try {
+      const stored = localStorage.getItem('galeriaImagenes');
+      if (stored) {
+        galeriaImagenes = JSON.parse(stored);
+        console.log('✅ Fallback: imágenes desde localStorage:', galeriaImagenes.length);
+      } else {
+        galeriaImagenes = [];
+      }
+    } catch (localError) {
+      console.error('❌ Error en fallback localStorage:', localError);
+      galeriaImagenes = [];
+    }
+  }
+  
+  try {
+    await limpiarDatosAntiguos();
+  } catch (error) {
+    console.error('⚠️ Error limpiando datos antiguos:', error);
+  }
+  
   datosListos = true; // marcar listo
   console.log('✅ Datos listos');
+  
   // Si el tab de reservas está visible en este momento, refrescar
   const reservasTab = document.getElementById('reservas-tab');
   if (reservasTab && reservasTab.style.display !== 'none') {
@@ -1135,14 +1171,31 @@ async function subirArchivos(files) {
   try {
     // Usar configuración desde config.js
     const storageConfig = getStorageConfig ? getStorageConfig() : { mode: 'local' };
-    const useFirebaseMode = storageConfig.mode === 'firebase';
+    let useFirebaseMode = storageConfig.mode === 'firebase';
     
-    console.log('📦 Modo de almacenamiento detectado:', storageConfig.mode);
+    console.log('📦 Modo de almacenamiento configurado:', storageConfig.mode);
     
+    // Intentar Firebase primero si está configurado
     if (useFirebaseMode && storage && database) {
-      // Modo Firebase: usar Firebase Storage
-      console.log('☁️ Usando Firebase Storage');
-      await subirArchivosFirebase(files, progressFill, progressText, nuevasImagenes, completados);
+      try {
+        console.log('☁️ Intentando Firebase Storage...');
+        await subirArchivosFirebase(files, progressFill, progressText, nuevasImagenes, completados);
+        console.log('✅ Firebase Storage exitoso');
+      } catch (firebaseError) {
+        console.error('❌ Error en Firebase Storage:', firebaseError);
+        
+        // Si hay error de CORS o red, usar localStorage como fallback
+        if (firebaseError.message.includes('CORS') || 
+            firebaseError.message.includes('Access to XMLHttpRequest') ||
+            firebaseError.message.includes('net::ERR_FAILED')) {
+          console.log('🔄 Fallback a localStorage por error de CORS/red');
+          progressText.textContent = 'Usando almacenamiento local...';
+          useFirebaseMode = false;
+          await subirArchivosLocal(files, progressFill, progressText, nuevasImagenes, completados);
+        } else {
+          throw firebaseError;
+        }
+      }
     } else {
       // Modo local: usar URLs de archivos locales
       console.log('💾 Usando almacenamiento local');
@@ -1152,10 +1205,15 @@ async function subirArchivos(files) {
     // Agregar imágenes al array global
     galeriaImagenes.push(...nuevasImagenes);
     
-    // Guardar según el modo configurado
+    // Guardar según el modo utilizado
     if (useFirebaseMode && database) {
-      await guardarImagenesGaleriaEnFirebase();
-      console.log('✅ Guardado en Firebase Database');
+      try {
+        await guardarImagenesGaleriaEnFirebase();
+        console.log('✅ Guardado en Firebase Database');
+      } catch (dbError) {
+        console.error('⚠️ Error guardando en Firebase Database, usando localStorage');
+        localStorage.setItem('galeriaImagenes', JSON.stringify(galeriaImagenes));
+      }
     } else {
       localStorage.setItem('galeriaImagenes', JSON.stringify(galeriaImagenes));
       console.log('✅ Guardado en localStorage');
@@ -1177,8 +1235,17 @@ async function subirArchivos(files) {
     
   } catch (error) {
     console.error('❌ Error en subida:', error);
-    progressText.textContent = '❌ Error en la subida';
-    alert('Error al subir las imágenes: ' + error.message);
+    progressText.textContent = '❌ Error en la subida - usando modo local';
+    
+    // Último fallback: intentar localStorage
+    try {
+      console.log('🔄 Último fallback a localStorage');
+      await subirArchivosLocal(files, progressFill, progressText, [], 0);
+      progressText.textContent = '✅ Imágenes guardadas localmente';
+    } catch (fallbackError) {
+      console.error('❌ Fallback también falló:', fallbackError);
+      alert('Error al subir las imágenes. Por favor, intenta con imágenes más pequeñas.');
+    }
     
     setTimeout(() => {
       progressBar.style.display = 'none';
@@ -1308,21 +1375,49 @@ function mostrarImagenesAdmin() {
   
   if (!grid || !stats) return;
   
-  // Detectar modo local
-  const isLocalMode = window.location.protocol === 'file:' || 
-                      window.location.hostname === 'localhost' || 
-                      window.location.hostname === '127.0.0.1' ||
-                      window.location.hostname.includes('github.io');
+  // Detectar modo actual
+  const storageConfig = getStorageConfig ? getStorageConfig() : { mode: 'local' };
+  const isLocalMode = storageConfig.mode === 'local';
+  const isGitHubPages = window.location.hostname.includes('github.io');
   
   // Mostrar/ocultar mensaje informativo
   if (devInfo) {
-    devInfo.style.display = isLocalMode ? 'block' : 'none';
+    if (isLocalMode || isGitHubPages) {
+      devInfo.style.display = 'block';
+      
+      // Mensaje específico para GitHub Pages
+      if (isGitHubPages) {
+        devInfo.innerHTML = `
+          <div class="info-message">
+            <span class="info-icon">ℹ️</span>
+            <div class="info-content">
+              <strong>Modo Local (GitHub Pages):</strong> Las imágenes se almacenan localmente en tu navegador para evitar errores de CORS. 
+              Las imágenes persisten mientras no limpies el caché del navegador.
+              <br><small>Para almacenamiento permanente en la nube, necesitas configurar Firebase en un servidor propio.</small>
+            </div>
+          </div>
+        `;
+      } else {
+        devInfo.innerHTML = `
+          <div class="info-message">
+            <span class="info-icon">ℹ️</span>
+            <div class="info-content">
+              <strong>Modo Local:</strong> Las imágenes se almacenan localmente en tu navegador. 
+              Para almacenamiento permanente en la nube, configura Firebase Storage en tu servidor.
+              <br><small>Las imágenes persisten mientras no limpies el caché del navegador.</small>
+            </div>
+          </div>
+        `;
+      }
+    } else {
+      devInfo.style.display = 'none';
+    }
   }
   
   // Actualizar estadísticas
   const imageCount = galeriaImagenes.length;
-  const modoTexto = isLocalMode ? ' (Modo Local)' : '';
-  stats.innerHTML = `<span class="image-count">${imageCount} imagen${imageCount !== 1 ? 'es' : ''}${modoTexto}</span>`;
+  const modeText = isLocalMode ? (isGitHubPages ? ' (GitHub Pages - Local)' : ' (Modo Local)') : ' (Firebase)';
+  stats.innerHTML = `<span class="image-count">${imageCount} imagen${imageCount !== 1 ? 'es' : ''}${modeText}</span>`;
   
   if (imageCount === 0) {
     grid.innerHTML = `

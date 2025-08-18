@@ -100,8 +100,13 @@ function detectStorageMode() {
       return 'local';
     }
     
-    // En hostings modernos, intentar Firebase si está disponible
+    // En hostings modernos, usar localStorage por defecto para evitar CORS
     if (isNetlify) {
+      console.log('🌐 Netlify detectado - usando localStorage (evita problemas CORS iniciales)');
+      return 'local';
+      
+      // Comentado temporalmente hasta configurar CORS correctamente
+      /*
       if (isFirebaseAvailable) {
         console.log('🌐 Netlify + Firebase detectado - usando Firebase Storage');
         return 'firebase';
@@ -109,6 +114,7 @@ function detectStorageMode() {
         console.log('🌐 Netlify detectado - usando localStorage (Firebase no disponible)');
         return 'local';
       }
+      */
     }
     
     if (isVercel || isFirebaseHosting) {

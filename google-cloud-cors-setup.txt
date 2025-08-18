@@ -1,0 +1,7 @@
+# Comando para configurar CORS en Google Cloud Storage
+# Ejecutar en Google Cloud Shell
+
+gsutil cors set cors.json gs://estudio-daniel-merquiz.appspot.com
+
+# Verificar que se aplicó
+gsutil cors get gs://estudio-daniel-merquiz.appspot.com

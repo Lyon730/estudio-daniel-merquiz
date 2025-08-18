@@ -2,19 +2,14 @@
   {
     "origin": [
       "https://www.estudiodanielmerquiz.com",
-      "https://estudiodanielmerquiz.com",
-      "https://*.netlify.app",
-      "https://*.github.io",
-      "http://localhost:*",
-      "http://127.0.0.1:*"
+      "https://estudiodanielmerquiz.com"
     ],
     "method": ["GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS"],
     "responseHeader": [
       "Content-Type",
       "Access-Control-Allow-Origin",
       "Access-Control-Allow-Methods",
-      "Access-Control-Allow-Headers",
-      "Access-Control-Max-Age"
+      "Access-Control-Allow-Headers"
     ],
     "maxAgeSeconds": 3600
   }

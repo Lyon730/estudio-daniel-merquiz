@@ -19,6 +19,11 @@ try {
     database = firebase.database();
     storage = firebase.storage();
     console.log('🔥 Firebase inicializado correctamente');
+    console.log('📊 Firebase config:', {
+      projectId: firebaseConfig.projectId,
+      storageBucket: firebaseConfig.storageBucket,
+      authDomain: firebaseConfig.authDomain
+    });
     
     // Test de conectividad
     database.ref('.info/connected').on('value', (snapshot) => {
@@ -29,13 +34,22 @@ try {
       }
     });
     
+    // Hacer disponible globalmente
+    window.database = database;
+    window.storage = storage;
+    
   } else {
-    console.warn('⚠️ Firebase no está disponible, usando modo local');
+    console.warn('⚠️ Firebase SDK no está disponible, usando modo local');
     database = null;
     storage = null;
   }
 } catch (error) {
   console.error('❌ Error al inicializar Firebase:', error);
+  console.log('🔧 Detalles del error:', {
+    message: error.message,
+    stack: error.stack,
+    config: firebaseConfig
+  });
   console.log('🔧 Cambiando a modo local automáticamente');
   database = null;
   storage = null;

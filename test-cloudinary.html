@@ -87,20 +87,42 @@
             const storageConfig = getStorageConfig();
             logResult(`📦 Modo de almacenamiento: ${storageConfig.mode}`, 'info');
 
+            // Mostrar configuración actual de Cloudinary
+            logResult(`🌤️ Cloud Name: "${CLOUDINARY_CONFIG.cloudName}"`, 'info');
+            logResult(`🎯 Upload Preset: "${CLOUDINARY_CONFIG.uploadPreset}"`, 'info');
+            logResult(`📁 Folder: "${CLOUDINARY_CONFIG.folder}"`, 'info');
+
             // Verificar configuración de Cloudinary
             if (typeof validateCloudinaryConfig === 'function') {
                 const isValid = validateCloudinaryConfig();
                 if (isValid) {
                     logResult('✅ Configuración de Cloudinary válida', 'success');
+                    
+                    // Hacer test de conexión
+                    if (typeof testCloudinaryConfig === 'function') {
+                        logResult('🔄 Probando conexión con Cloudinary...', 'info');
+                        testCloudinaryConfig().then(result => {
+                            if (result.success) {
+                                logResult('✅ Conexión exitosa con Cloudinary!', 'success');
+                                logResult(`🖼️ Imagen de prueba subida: ${result.publicId}`, 'success');
+                            } else {
+                                logResult(`❌ Error de conexión: ${result.error}`, 'error');
+                                if (result.details) {
+                                    logResult(`📝 Detalles: ${result.details}`, 'warning');
+                                }
+                                if (result.status === 400) {
+                                    logResult('💡 Posible problema: Upload preset no configurado o incorrecto', 'warning');
+                                }
+                            }
+                        });
+                    }
                 } else {
                     logResult('⚠️ Configuración de Cloudinary incompleta', 'warning');
-                    logResult(`Cloud Name actual: "${CLOUDINARY_CONFIG.cloudName}"`, 'info');
-                    logResult(`Upload Preset actual: "${CLOUDINARY_CONFIG.uploadPreset}"`, 'info');
                 }
             }
 
             // Verificar funciones disponibles
-            const functions = ['uploadToCloudinary', 'getAllCloudinaryImages', 'getOptimizedUrl'];
+            const functions = ['uploadToCloudinary', 'getAllCloudinaryImages', 'getOptimizedUrl', 'testCloudinaryConfig'];
             functions.forEach(func => {
                 if (typeof window[func] === 'function') {
                     logResult(`✅ Función ${func} disponible`, 'success');

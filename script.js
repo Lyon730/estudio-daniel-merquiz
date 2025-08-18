@@ -1634,11 +1634,20 @@ async function eliminarImagen(imageId) {
   if (!confirmar) return;
   
   try {
-    // Si es una imagen de Firebase Storage, eliminarla de allí
+    // Eliminar según el tipo de imagen
     if (imagen.tipo === 'firebase' && storage) {
       const storageRef = storage.ref(`galeria/${imagen.nombreArchivo}`);
       await storageRef.delete();
       console.log('✅ Imagen eliminada de Firebase Storage');
+    } else if (imagen.tipo === 'cloudinary' && typeof deleteFromCloudinary !== 'undefined') {
+      // Intentar eliminar de Cloudinary (requiere configuración adicional)
+      try {
+        await deleteFromCloudinary(imagen.cloudinary?.publicId || imagen.id);
+        console.log('✅ Imagen eliminada de Cloudinary');
+      } catch (cloudinaryError) {
+        console.warn('⚠️ No se pudo eliminar de Cloudinary:', cloudinaryError);
+        // Continuar con la eliminación local
+      }
     } else if (imagen.tipo === 'local' && imagen.url) {
       // Si es una imagen local, revocar la URL del objeto
       URL.revokeObjectURL(imagen.url);
@@ -1654,12 +1663,18 @@ async function eliminarImagen(imageId) {
     // Guardar cambios según configuración
     const storageConfig = getStorageConfig ? getStorageConfig() : { mode: 'local' };
     
-    if (storageConfig.mode === 'firebase' && database) {
-      await guardarImagenesGaleriaEnFirebase();
-      console.log('✅ Cambios guardados en Firebase');
-    } else {
+    try {
+      if ((storageConfig.mode === 'firebase' || storageConfig.mode === 'cloudinary') && database) {
+        // En modo Firebase o Cloudinary, usar Firebase Database para sincronización
+        await guardarImagenesGaleriaEnFirebase();
+        console.log('✅ Eliminación sincronizada en Firebase Database (global)');
+      }
+      // Siempre actualizar localStorage como caché
       localStorage.setItem('galeriaImagenes', JSON.stringify(galeriaImagenes));
-      console.log('✅ Cambios guardados en localStorage');
+      console.log('✅ Cambios guardados en localStorage (caché)');
+    } catch (dbError) {
+      console.error('⚠️ Error sincronizando eliminación, usando solo localStorage');
+      localStorage.setItem('galeriaImagenes', JSON.stringify(galeriaImagenes));
     }
     
     // Actualizar vistas

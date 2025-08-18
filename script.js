@@ -377,7 +377,7 @@ async function inicializarDatos() {
   }
   
   try {
-    await cargarImagenesGaleriaDesdeFirebase();
+    await cargarImagenesGaleria();
   } catch (error) {
     console.error('⚠️ Error cargando galería:', error);
     // Fallback a localStorage en caso de error
@@ -1112,6 +1112,90 @@ async function guardarImagenesGaleriaEnFirebase() {
   }
 }
 
+// Función universal para cargar imágenes desde cualquier proveedor
+async function cargarImagenesGaleria() {
+  try {
+    // Obtener configuración de almacenamiento
+    const storageConfig = getStorageConfig ? getStorageConfig() : { mode: 'local' };
+    
+    console.log('📁 Cargando imágenes en modo:', storageConfig.mode);
+    
+    if (storageConfig.mode === 'cloudinary') {
+      // Cargar imágenes desde Cloudinary y localStorage
+      await cargarImagenesCloudinary();
+    } else if (storageConfig.mode === 'firebase' && database) {
+      // Intentar cargar desde Firebase Database
+      try {
+        await cargarImagenesGaleriaDesdeFirebase();
+      } catch (error) {
+        console.error('Error cargando desde Firebase:', error);
+        // Fallback a localStorage
+        cargarImagenesDesdeLocalStorage();
+      }
+    } else {
+      // Cargar desde localStorage
+      cargarImagenesDesdeLocalStorage();
+    }
+    
+    console.log('✅ Galería cargada:', galeriaImagenes.length, 'imágenes');
+    
+  } catch (error) {
+    console.error('Error cargando galería:', error);
+    // Fallback a localStorage siempre
+    cargarImagenesDesdeLocalStorage();
+  }
+}
+
+// Función para cargar imágenes desde Cloudinary
+async function cargarImagenesCloudinary() {
+  try {
+    console.log('🌤️ Cargando imágenes desde Cloudinary...');
+    
+    // Primero cargar desde localStorage como caché
+    cargarImagenesDesdeLocalStorage();
+    
+    // Luego verificar si hay nuevas imágenes en Cloudinary
+    if (typeof getAllCloudinaryImages === 'function') {
+      const cloudinaryImages = await getAllCloudinaryImages();
+      
+      // Combinar con imágenes locales sin duplicados
+      const imagenesExistentes = new Set(galeriaImagenes.map(img => img.id));
+      
+      cloudinaryImages.forEach(cloudImg => {
+        if (!imagenesExistentes.has(cloudImg.id)) {
+          galeriaImagenes.push(cloudImg);
+        }
+      });
+      
+      // Actualizar localStorage con la lista combinada
+      localStorage.setItem('galeriaImagenes', JSON.stringify(galeriaImagenes));
+      console.log('✅ Imágenes de Cloudinary sincronizadas');
+    }
+    
+  } catch (error) {
+    console.error('❌ Error cargando desde Cloudinary:', error);
+    // Usar localStorage como fallback
+    cargarImagenesDesdeLocalStorage();
+  }
+}
+
+// Función para cargar solo desde localStorage
+function cargarImagenesDesdeLocalStorage() {
+  try {
+    const stored = localStorage.getItem('galeriaImagenes');
+    if (stored) {
+      galeriaImagenes = JSON.parse(stored);
+      console.log('✅ Imágenes desde localStorage:', galeriaImagenes.length);
+    } else {
+      console.log('ℹ️ No hay imágenes en localStorage');
+      galeriaImagenes = [];
+    }
+  } catch (err) {
+    console.error('❌ Error cargando desde localStorage:', err);
+    galeriaImagenes = [];
+  }
+}
+
 // === FUNCIONES PARA ADMINISTRADOR ===
 function configurarEventosGaleria() {
   const uploadArea = document.getElementById('upload-area');
@@ -1171,12 +1255,29 @@ async function subirArchivos(files) {
   try {
     // Usar configuración desde config.js
     const storageConfig = getStorageConfig ? getStorageConfig() : { mode: 'local' };
+    let useCloudinaryMode = storageConfig.mode === 'cloudinary';
     let useFirebaseMode = storageConfig.mode === 'firebase';
     
     console.log('📦 Modo de almacenamiento configurado:', storageConfig.mode);
     
-    // Intentar Firebase primero si está configurado
-    if (useFirebaseMode && storage && database) {
+    // Intentar Cloudinary primero si está configurado
+    if (useCloudinaryMode && typeof uploadToCloudinary !== 'undefined') {
+      try {
+        console.log('🌤️ Intentando Cloudinary...');
+        await subirArchivosCloudinary(files, progressFill, progressText, nuevasImagenes, completados);
+        console.log('✅ Cloudinary exitoso');
+      } catch (cloudinaryError) {
+        console.error('❌ Error en Cloudinary:', cloudinaryError);
+        
+        // Fallback a localStorage si Cloudinary falla
+        console.log('🔄 Fallback a localStorage por error de Cloudinary');
+        progressText.textContent = 'Usando almacenamiento local...';
+        useCloudinaryMode = false;
+        await subirArchivosLocal(files, progressFill, progressText, nuevasImagenes, completados);
+      }
+    }
+    // Intentar Firebase si está configurado
+    else if (useFirebaseMode && storage && database) {
       try {
         console.log('☁️ Intentando Firebase Storage...');
         await subirArchivosFirebase(files, progressFill, progressText, nuevasImagenes, completados);
@@ -1206,7 +1307,12 @@ async function subirArchivos(files) {
     galeriaImagenes.push(...nuevasImagenes);
     
     // Guardar según el modo utilizado
-    if (useFirebaseMode && database) {
+    if (useCloudinaryMode) {
+      // Cloudinary maneja el almacenamiento automáticamente
+      // Solo guardamos referencias en localStorage para offline
+      localStorage.setItem('galeriaImagenes', JSON.stringify(galeriaImagenes));
+      console.log('✅ Referencias guardadas localmente (Cloudinary)');
+    } else if (useFirebaseMode && database) {
       try {
         await guardarImagenesGaleriaEnFirebase();
         console.log('✅ Guardado en Firebase Database');
@@ -1250,6 +1356,67 @@ async function subirArchivos(files) {
     setTimeout(() => {
       progressBar.style.display = 'none';
     }, 3000);
+  }
+}
+
+// Función para subir archivos a Cloudinary
+async function subirArchivosCloudinary(files, progressFill, progressText, nuevasImagenes, completados) {
+  for (const file of files) {
+    // Validar archivo
+    if (!file.type.startsWith('image/')) {
+      console.warn(`⚠️ Archivo ignorado (no es imagen): ${file.name}`);
+      completados++;
+      continue;
+    }
+    
+    if (file.size > 5 * 1024 * 1024) { // 5MB
+      alert(`❌ ${file.name} es muy grande (máx. 5MB)`);
+      completados++;
+      continue;
+    }
+    
+    try {
+      progressText.textContent = `Subiendo ${file.name} a Cloudinary...`;
+      
+      // Subir a Cloudinary
+      const cloudinaryResponse = await uploadToCloudinary(file);
+      
+      // Crear objeto de imagen
+      const nuevaImagen = {
+        id: cloudinaryResponse.id,
+        nombre: file.name,
+        url: cloudinaryResponse.url,
+        thumbnail: cloudinaryResponse.thumbnail,
+        gallery: cloudinaryResponse.gallery,
+        tamaño: file.size,
+        tipo: 'cloudinary',
+        fechaSubida: new Date().toISOString(),
+        cloudinary: {
+          publicId: cloudinaryResponse.id,
+          format: cloudinaryResponse.format,
+          width: cloudinaryResponse.width,
+          height: cloudinaryResponse.height,
+          bytes: cloudinaryResponse.bytes
+        }
+      };
+      
+      nuevasImagenes.push(nuevaImagen);
+      completados++;
+      
+      // Actualizar progreso
+      const progreso = (completados / files.length) * 100;
+      progressFill.style.width = progreso + '%';
+      
+      console.log('✅ Imagen subida a Cloudinary:', cloudinaryResponse.id);
+      
+    } catch (error) {
+      console.error('❌ Error subiendo a Cloudinary:', file.name, error);
+      completados++;
+      
+      // Continuar con el siguiente archivo si hay error
+      const progreso = (completados / files.length) * 100;
+      progressFill.style.width = progreso + '%';
+    }
   }
 }
 

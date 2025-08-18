@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Cloudinary - Estudio Daniel Merquiz</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 20px;
+        }
+        .status { 
+            padding: 10px; 
+            margin: 10px 0; 
+            border-radius: 5px; 
+        }
+        .success { background-color: #d4edda; color: #155724; }
+        .warning { background-color: #fff3cd; color: #856404; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .test-area {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        #results { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test de Configuración Cloudinary</h1>
+    <p>Esta página verifica si Cloudinary está configurado correctamente.</p>
+
+    <div id="status"></div>
+
+    <div class="test-area">
+        <h3>📤 Test de Subida</h3>
+        <input type="file" id="test-file" accept="image/*" style="margin: 10px;">
+        <br>
+        <button onclick="testUpload()">Probar Subida</button>
+        <button onclick="testConfig()">Verificar Configuración</button>
+    </div>
+
+    <div id="results"></div>
+
+    <!-- Scripts necesarios -->
+    <script src="config.js"></script>
+    <script src="cloudinary-config.js"></script>
+
+    <script>
+        function logResult(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = 'status ' + type;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}</strong>: ${message}`;
+            results.appendChild(div);
+            results.scrollTop = results.scrollHeight;
+            console.log(message);
+        }
+
+        function testConfig() {
+            logResult('🔍 Verificando configuración...', 'info');
+            
+            // Verificar que los scripts estén cargados
+            if (typeof CLOUDINARY_CONFIG === 'undefined') {
+                logResult('❌ cloudinary-config.js no cargado', 'error');
+                return;
+            }
+
+            if (typeof getStorageConfig === 'undefined') {
+                logResult('❌ config.js no cargado', 'error');
+                return;
+            }
+
+            // Verificar configuración de almacenamiento
+            const storageConfig = getStorageConfig();
+            logResult(`📦 Modo de almacenamiento: ${storageConfig.mode}`, 'info');
+
+            // Verificar configuración de Cloudinary
+            if (typeof validateCloudinaryConfig === 'function') {
+                const isValid = validateCloudinaryConfig();
+                if (isValid) {
+                    logResult('✅ Configuración de Cloudinary válida', 'success');
+                } else {
+                    logResult('⚠️ Configuración de Cloudinary incompleta', 'warning');
+                    logResult(`Cloud Name actual: "${CLOUDINARY_CONFIG.cloudName}"`, 'info');
+                    logResult(`Upload Preset actual: "${CLOUDINARY_CONFIG.uploadPreset}"`, 'info');
+                }
+            }
+
+            // Verificar funciones disponibles
+            const functions = ['uploadToCloudinary', 'getAllCloudinaryImages', 'getOptimizedUrl'];
+            functions.forEach(func => {
+                if (typeof window[func] === 'function') {
+                    logResult(`✅ Función ${func} disponible`, 'success');
+                } else {
+                    logResult(`❌ Función ${func} no disponible`, 'error');
+                }
+            });
+        }
+
+        async function testUpload() {
+            const fileInput = document.getElementById('test-file');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                logResult('❌ Por favor selecciona un archivo primero', 'error');
+                return;
+            }
+
+            logResult(`📤 Intentando subir: ${file.name} (${(file.size/1024/1024).toFixed(2)}MB)`, 'info');
+
+            try {
+                // Verificar configuración antes de subir
+                if (!validateCloudinaryConfig()) {
+                    logResult('❌ Configuración de Cloudinary inválida. Revisa CLOUDINARY_SETUP.md', 'error');
+                    return;
+                }
+
+                // Intentar subida
+                const result = await uploadToCloudinary(file);
+                
+                logResult('✅ ¡Subida exitosa!', 'success');
+                logResult(`🔗 URL: ${result.url}`, 'success');
+                logResult(`📏 Dimensiones: ${result.width}x${result.height}`, 'info');
+                logResult(`💾 Tamaño: ${(result.bytes/1024/1024).toFixed(2)}MB`, 'info');
+
+                // Mostrar imagen
+                const img = document.createElement('img');
+                img.src = result.thumbnail || result.url;
+                img.style.maxWidth = '200px';
+                img.style.margin = '10px';
+                img.style.border = '2px solid green';
+                document.getElementById('results').appendChild(img);
+
+            } catch (error) {
+                logResult(`❌ Error en subida: ${error.message}`, 'error');
+                if (error.message.includes('Cloudinary incompleta')) {
+                    logResult('💡 Tip: Revisa el archivo CLOUDINARY_SETUP.md para configurar correctamente', 'warning');
+                }
+            }
+        }
+
+        // Auto-verificar al cargar la página
+        window.addEventListener('load', () => {
+            setTimeout(testConfig, 500);
+        });
+    </script>
+</body>
+</html>

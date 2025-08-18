@@ -4,9 +4,10 @@
 const APP_CONFIG = {
   // CONFIGURACIÓN DE ALMACENAMIENTO
   storage: {
-    // Cambiar a 'firebase' para usar Firebase Storage
+    // Cambiar a 'cloudinary' para usar Cloudinary
     // Cambiar a 'local' para usar localStorage
-    mode: 'auto', // 'local' | 'firebase' | 'auto'
+    // Cambiar a 'firebase' para usar Firebase Storage
+    mode: 'cloudinary', // 'local' | 'firebase' | 'cloudinary' | 'auto'
     
     // Configuración de Firebase
     firebase: {
@@ -26,6 +27,18 @@ const APP_CONFIG = {
       localStorageKey: 'galeriaImagenes',
       maxImages: 50, // Límite de imágenes en localStorage
       maxSizePerImage: 5 * 1024 * 1024 // 5MB por imagen
+    },
+    
+    // Configuración de Cloudinary
+    cloudinary: {
+      enabled: true,
+      folder: 'estudio-daniel-merquiz/galeria',
+      uploadPreset: 'estudio_galeria',
+      maxImages: 100,
+      transformations: {
+        thumbnail: 'c_fill,w_300,h_200,q_auto',
+        gallery: 'c_limit,w_1200,h_800,q_auto'
+      }
     }
   },
   
@@ -66,77 +79,46 @@ function detectStorageMode() {
   // Si está configurado manualmente, respetar la configuración
   const manualMode = APP_CONFIG.storage.mode;
   
-  const isLocalDev = window.location.protocol === 'file:' || 
-                     window.location.hostname === 'localhost' || 
-                     window.location.hostname === '127.0.0.1';
-  
-  const isGitHubPages = window.location.hostname.includes('github.io');
-  const isNetlify = window.location.hostname.includes('netlify.app') || 
-                   window.location.hostname.includes('.netlify.app');
-  const isVercel = window.location.hostname.includes('vercel.app');
-  const isFirebaseHosting = window.location.hostname.includes('.web.app') || 
-                           window.location.hostname.includes('.firebaseapp.com');
-  
-  const isFirebaseAvailable = typeof firebase !== 'undefined' && 
-                              window.database && 
-                              window.storage;
-  
   // Modo manual específico
   if (manualMode === 'local') {
     console.log('🔧 Modo local forzado por configuración');
     return 'local';
   }
   
-  if (manualMode === 'firebase' && isFirebaseAvailable) {
+  if (manualMode === 'firebase') {
     console.log('☁️ Modo Firebase forzado por configuración');
     return 'firebase';
   }
   
+  if (manualMode === 'cloudinary') {
+    console.log('🌤️ Modo Cloudinary forzado por configuración');
+    return 'cloudinary';
+  }
+  
+  // Verificar disponibilidad
+  const isCloudinaryAvailable = typeof uploadToCloudinary !== 'undefined' && isCloudinaryConfigured();
+  const isFirebaseAvailable = typeof firebase !== 'undefined' && window.database && window.storage;
+  
   // Modo automático
   if (manualMode === 'auto') {
-    // En desarrollo local, usar localStorage
-    if (isLocalDev) {
-      console.log('🔧 Desarrollo local detectado - usando localStorage');
-      return 'local';
+    // Preferir Cloudinary si está disponible
+    if (isCloudinaryAvailable) {
+      console.log('�️ Cloudinary disponible - usando Cloudinary');
+      return 'cloudinary';
     }
     
-    // En hostings modernos, usar localStorage hasta resolver CORS completamente
-    if (isNetlify) {
-      console.log('🌐 Netlify detectado - usando localStorage (CORS aún en proceso)');
-      return 'local';
-      
-      /* Habilitar cuando CORS funcione 100%
-      if (isFirebaseAvailable) {
-        console.log('🌐 Netlify + Firebase detectado - probando Firebase Storage');
-        return 'firebase';
-      } else {
-        console.log('🌐 Netlify detectado - usando localStorage (Firebase no disponible)');
-        return 'local';
-      }
-      */
-    }
-    
-    if (isVercel || isFirebaseHosting) {
-      if (isFirebaseAvailable) {
-        console.log('☁️ Hosting compatible + Firebase detectado - usando Firebase Storage');
-        return 'firebase';
-      }
-    }
-    
-    // En GitHub Pages, usar localStorage para evitar CORS
-    if (isGitHubPages) {
-      console.log('📄 GitHub Pages detectado - usando localStorage (evita CORS)');
-      return 'local';
-    }
-    
-    // En otros entornos, usar Firebase si está disponible
+    // Fallback a Firebase si está disponible
     if (isFirebaseAvailable) {
       console.log('☁️ Firebase disponible - usando Firebase Storage');
       return 'firebase';
     }
+    
+    // Último fallback a localStorage
+    console.log('� Fallback a localStorage');
+    return 'local';
   }
   
-  // Fallback a localStorage
+  // Fallback por defecto
   console.log('💾 Fallback a localStorage');
   return 'local';
 }

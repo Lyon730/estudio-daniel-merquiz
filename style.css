@@ -1506,11 +1506,10 @@ footer {
 /* ===== SECCIÓN PRODUCTOS ===== */
 .productos {
   padding: 4rem 0;
-  background: linear-gradient(135deg, #1c1c1c 0%, #2e2e2e 100%);
+  background: #1c1c1c;
 }
 
 .productos h2 {
-  text-align: center;
   color: #f5f5dc;
   font-family: 'Playfair Display', serif;
   font-size: 2.5rem;
@@ -1520,7 +1519,6 @@ footer {
 }
 
 .productos p {
-  text-align: center;
   color: #cccccc;
   font-size: 1.1rem;
   margin-bottom: 3rem;

@@ -1504,12 +1504,19 @@ footer {
 }
 
 /* ===== SECCIÓN PRODUCTOS ===== */
-.productos {
+.productos-showcase {
   padding: 4rem 0;
   background: #1c1c1c;
+  border-bottom: 1px solid #444;
 }
 
-.productos h2 {
+.productos-showcase .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.productos-showcase h2 {
   color: #f5f5dc;
   font-family: 'Playfair Display', serif;
   font-size: 2.5rem;
@@ -1518,13 +1525,11 @@ footer {
   text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
 }
 
-.productos p {
+.productos-showcase p {
   color: #cccccc;
   font-size: 1.1rem;
   margin-bottom: 3rem;
   max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 .productos-grid {
@@ -1534,6 +1539,15 @@ footer {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 2rem;
+}
+
+.productos-carousel-container {
+  position: relative;
+  width: 100%;
+}
+
+.productos-carousel-controls {
+  display: none; /* Ocultos por defecto en desktop */
 }
 
 .producto-card {
@@ -1649,23 +1663,73 @@ footer {
 
 /* Responsive para productos */
 @media (max-width: 768px) {
-  .productos-grid {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-    padding: 0 1rem;
+  .productos-showcase {
+    position: relative;
   }
   
-  .productos h2 {
+  .productos-grid {
+    display: flex;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    gap: 1rem;
+    padding: 0 1rem;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+  }
+  
+  .productos-grid::-webkit-scrollbar {
+    display: none; /* WebKit */
+  }
+  
+  .producto-card {
+    flex: 0 0 280px; /* Ancho fijo para cada card */
+    max-width: 280px;
+  }
+  
+  .productos-showcase h2 {
     font-size: 2rem;
   }
   
-  .productos p {
+  .productos-showcase p {
     font-size: 1rem;
     padding: 0 1rem;
   }
   
-  .producto-card {
-    max-width: 100%;
+  /* Controles del carrusel de productos */
+  .productos-carousel-controls {
+    display: flex; /* Mostrar en móvil */
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.5);
+    border: none;
+    color: #f5f5dc;
+    font-size: 1.5rem;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 10;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .productos-carousel-controls:hover {
+    background: rgba(212, 175, 55, 0.8);
+  }
+  
+  .productos-carousel-controls.prev {
+    left: 10px;
+  }
+  
+  .productos-carousel-controls.next {
+    right: 10px;
+  }
+  
+  .productos-carousel-controls.hidden {
+    opacity: 0;
+    pointer-events: none;
   }
 }
 

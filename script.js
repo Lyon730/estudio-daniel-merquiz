@@ -298,6 +298,9 @@ function initProductos() {
   // Cargar productos desde localStorage o Firebase
   loadProductos();
   
+  // Configurar listeners del carrusel
+  setupProductosCarouselListeners();
+  
   // Event listeners para formulario de productos
   const productoForm = document.getElementById('producto-form');
   const productoImagenInput = document.getElementById('producto-imagen-input');
@@ -551,6 +554,9 @@ function updateProductosUI() {
     `;
     grid.appendChild(card);
   });
+  
+  // Actualizar controles del carrusel
+  setTimeout(updateProductosCarouselControls, 100);
 }
 
 // Actualizar sección pública de productos
@@ -599,6 +605,9 @@ function updateProductosSection() {
       verMasContainer.style.display = 'none';
     }
   }
+  
+  // Actualizar controles del carrusel
+  setTimeout(updateProductosCarouselControls, 100);
 }
 
 // Editar producto
@@ -686,6 +695,9 @@ function verMasProductos() {
   if (verMasContainer) {
     verMasContainer.style.display = 'none';
   }
+  
+  // Actualizar controles del carrusel
+  setTimeout(updateProductosCarouselControls, 100);
 }
 
 // Formatear precio en pesos chilenos
@@ -696,6 +708,73 @@ function formatearPrecio(precio) {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0
   }).format(precio);
+}
+
+// ===== CARRUSEL DE PRODUCTOS MÓVIL =====
+
+let productosScrollPosition = 0;
+
+function moveProductosCarousel(direction) {
+  const grid = document.getElementById('productos-grid');
+  const cardWidth = 280 + 16; // Ancho de card + gap
+  const maxScroll = grid.scrollWidth - grid.clientWidth;
+  
+  productosScrollPosition += direction * cardWidth;
+  
+  // Limitar el scroll
+  if (productosScrollPosition < 0) {
+    productosScrollPosition = 0;
+  } else if (productosScrollPosition > maxScroll) {
+    productosScrollPosition = maxScroll;
+  }
+  
+  grid.scrollTo({
+    left: productosScrollPosition,
+    behavior: 'smooth'
+  });
+  
+  // Actualizar visibilidad de flechas
+  updateProductosCarouselControls();
+}
+
+function updateProductosCarouselControls() {
+  if (window.innerWidth > 768) return; // Solo en móvil
+  
+  const grid = document.getElementById('productos-grid');
+  const prevBtn = document.getElementById('productos-prev');
+  const nextBtn = document.getElementById('productos-next');
+  
+  if (!grid || !prevBtn || !nextBtn) return;
+  
+  const maxScroll = grid.scrollWidth - grid.clientWidth;
+  
+  // Mostrar/ocultar flecha anterior
+  if (grid.scrollLeft <= 0) {
+    prevBtn.classList.add('hidden');
+  } else {
+    prevBtn.classList.remove('hidden');
+  }
+  
+  // Mostrar/ocultar flecha siguiente
+  if (grid.scrollLeft >= maxScroll) {
+    nextBtn.classList.add('hidden');
+  } else {
+    nextBtn.classList.remove('hidden');
+  }
+}
+
+// Escuchar el scroll para actualizar las flechas
+function setupProductosCarouselListeners() {
+  const grid = document.getElementById('productos-grid');
+  if (grid) {
+    grid.addEventListener('scroll', () => {
+      productosScrollPosition = grid.scrollLeft;
+      updateProductosCarouselControls();
+    });
+    
+    // Actualizar al cargar y redimensionar
+    window.addEventListener('resize', updateProductosCarouselControls);
+  }
 }
 let currentSlide = 0; // Índice actual del carrusel
 console.log('[INIT] Variables globales declaradas.');

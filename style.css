@@ -76,7 +76,15 @@ body {
   margin: 0 0 2rem 0;
   padding: 0.5rem 0;
   color: #00ffff;
+  -webkit-text-stroke: 1px #000000;
+  text-stroke: 1px #000000;
   text-shadow: 
+    /* Contorno negro adicional */
+    -1px -1px 0 #000000,
+    1px -1px 0 #000000,
+    -1px 1px 0 #000000,
+    1px 1px 0 #000000,
+    /* Efectos de neón */
     0 0 5px #00ffff,
     0 0 10px #00ffff,
     0 0 15px #00ffff,
@@ -116,7 +124,14 @@ body {
 @keyframes neonFlicker {
   0%, 18%, 22%, 25%, 53%, 57%, 100% {
     color: #00ffff;
+    -webkit-text-stroke: 1px #000000;
     text-shadow: 
+      /* Contorno negro */
+      -1px -1px 0 #000000,
+      1px -1px 0 #000000,
+      -1px 1px 0 #000000,
+      1px 1px 0 #000000,
+      /* Efectos de neón */
       0 0 5px #00ffff,
       0 0 10px #00ffff,
       0 0 15px #00ffff,
@@ -128,7 +143,14 @@ body {
   
   19%, 21%, 23%, 24%, 54%, 56% {
     color: #004d4d;
+    -webkit-text-stroke: 1px #000000;
     text-shadow: 
+      /* Contorno negro mantenido */
+      -1px -1px 0 #000000,
+      1px -1px 0 #000000,
+      -1px 1px 0 #000000,
+      1px 1px 0 #000000,
+      /* Efectos apagados */
       0 0 2px #004d4d,
       0 2px 0 #001a1a;
   }
@@ -136,7 +158,14 @@ body {
   /* Parpadeos más rápidos para simular problemas eléctricos */
   26%, 27%, 28% {
     color: #00cccc;
+    -webkit-text-stroke: 1px #000000;
     text-shadow: 
+      /* Contorno negro */
+      -1px -1px 0 #000000,
+      1px -1px 0 #000000,
+      -1px 1px 0 #000000,
+      1px 1px 0 #000000,
+      /* Efectos de neón */
       0 0 3px #00cccc,
       0 0 8px #00cccc,
       0 0 12px #00cccc,
@@ -145,7 +174,14 @@ body {
   
   58%, 59%, 60%, 61% {
     color: #0080ff;
+    -webkit-text-stroke: 1px #000000;
     text-shadow: 
+      /* Contorno negro */
+      -1px -1px 0 #000000,
+      1px -1px 0 #000000,
+      -1px 1px 0 #000000,
+      1px 1px 0 #000000,
+      /* Efectos de neón */
       0 0 4px #0080ff,
       0 0 9px #0080ff,
       0 0 14px #0080ff,
@@ -284,7 +320,14 @@ body {
     line-height: 1.1;
     padding: 0.8rem 0;
     color: #00ffff;
+    -webkit-text-stroke: 0.8px #000000;
     text-shadow: 
+      /* Contorno negro para móvil */
+      -1px -1px 0 #000000,
+      1px -1px 0 #000000,
+      -1px 1px 0 #000000,
+      1px 1px 0 #000000,
+      /* Efectos de neón para móvil */
       0 0 4px #00ffff,
       0 0 8px #00ffff,
       0 0 12px #00ffff,

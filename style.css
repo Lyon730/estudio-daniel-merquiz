@@ -1505,15 +1505,9 @@ footer {
 
 /* ===== SECCIÓN PRODUCTOS ===== */
 .productos {
-  padding: 4rem 0;
+  padding: 2rem;
   background: #1c1c1c;
   border-bottom: 1px solid #444;
-}
-
-.productos .container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 2rem;
 }
 
 .productos p {
@@ -1656,6 +1650,7 @@ footer {
 @media (max-width: 768px) {
   .productos {
     position: relative;
+    padding: 2rem 1rem; /* Mantener padding consistente en móvil */
   }
   
   .productos-grid {

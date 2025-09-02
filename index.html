@@ -38,7 +38,7 @@
         <ul>
           <li><a href="#inicio">Inicio</a></li>
           <li><a href="#servicios">Servicios</a></li>
-          <li><a href="#productos-showcase">Productos</a></li>
+          <li><a href="#productos">Productos</a></li>
           <li><a href="#reservas">Reservas</a></li>
           <li><a href="#contacto">Contacto</a></li>
           <li><a href="#galeria">Galería</a></li>
@@ -52,7 +52,7 @@
     <ul>
       <li><a href="#inicio">Inicio</a></li>
       <li><a href="#servicios">Servicios</a></li>
-      <li><a href="#productos-showcase">Productos</a></li>
+      <li><a href="#productos">Productos</a></li>
       <li><a href="#reservas">Reservas</a></li>
       <li><a href="#contacto">Contacto</a></li>
       <li><a href="#galeria">Galería</a></li>
@@ -62,7 +62,28 @@
   <main>
     <section id="inicio"><h2>Bienvenidos</h2><p>Tu estilo comienza aquí.</p></section>
     <section id="servicios"><h2>Servicios</h2><p>Cortes, afeitados y más.</p></section>
-    <section id="productos"><h2>Productos</h2><p>Descubre nuestra selección de productos profesionales para el cuidado del cabello</p></section>
+    <section id="productos" class="productos">
+      <h2>Productos</h2>
+      <p>Descubre nuestra selección de productos profesionales para el cuidado del cabello</p>
+      
+      <div class="productos-carousel-container">
+        <button class="productos-carousel-controls prev" id="productos-prev" onclick="moveProductosCarousel(-1)">
+          <span>‹</span>
+        </button>
+        
+        <div id="productos-grid" class="productos-grid">
+          <!-- Los productos se cargarán dinámicamente aquí -->
+        </div>
+        
+        <button class="productos-carousel-controls next" id="productos-next" onclick="moveProductosCarousel(1)">
+          <span>›</span>
+        </button>
+      </div>
+      
+      <div id="ver-mas-container" class="ver-mas-container" style="display: none;">
+        <button id="ver-mas-btn" class="ver-mas-btn" onclick="verMasProductos()">Ver más productos</button>
+      </div>
+    </section>
     <section id="reservas">
       <h2>Reservas</h2>
       <form id="form-reserva">
@@ -181,32 +202,6 @@
       </div>
     </section>
   </main>
-
-  <!-- Sección de productos completa -->
-  <section id="productos-showcase" class="productos-showcase">
-    <div class="container">
-      <h2>Nuestros Productos</h2>
-      <p>Descubre nuestra selección de productos profesionales para el cuidado del cabello</p>
-      
-      <div class="productos-carousel-container">
-        <button class="productos-carousel-controls prev" id="productos-prev" onclick="moveProductosCarousel(-1)">
-          <span>‹</span>
-        </button>
-        
-        <div id="productos-grid" class="productos-grid">
-          <!-- Los productos se cargarán dinámicamente aquí -->
-        </div>
-        
-        <button class="productos-carousel-controls next" id="productos-next" onclick="moveProductosCarousel(1)">
-          <span>›</span>
-        </button>
-      </div>
-      
-      <div id="ver-mas-container" class="ver-mas-container" style="display: none;">
-        <button id="ver-mas-btn" class="ver-mas-btn" onclick="verMasProductos()">Ver más productos</button>
-      </div>
-    </div>
-  </section>
 
   <!-- Modal de inicio de sesión -->
   <div id="login-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.2); z-index:1000; justify-content:center; align-items:center;">

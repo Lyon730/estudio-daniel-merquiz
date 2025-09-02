@@ -1504,19 +1504,19 @@ footer {
 }
 
 /* ===== SECCIÓN PRODUCTOS ===== */
-.productos-showcase {
+.productos {
   padding: 4rem 0;
   background: #1c1c1c;
   border-bottom: 1px solid #444;
 }
 
-.productos-showcase .container {
+.productos .container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 2rem;
 }
 
-.productos-showcase h2 {
+.productos h2 {
   color: #f5f5dc;
   font-family: 'Playfair Display', serif;
   font-size: 2.5rem;
@@ -1525,7 +1525,7 @@ footer {
   text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
 }
 
-.productos-showcase p {
+.productos p {
   color: #cccccc;
   font-size: 1.1rem;
   margin-bottom: 3rem;
@@ -1663,7 +1663,7 @@ footer {
 
 /* Responsive para productos */
 @media (max-width: 768px) {
-  .productos-showcase {
+  .productos {
     position: relative;
   }
   
@@ -1686,11 +1686,11 @@ footer {
     max-width: 280px;
   }
   
-  .productos-showcase h2 {
+  .productos h2 {
     font-size: 2rem;
   }
   
-  .productos-showcase p {
+  .productos p {
     font-size: 1rem;
     padding: 0 1rem;
   }

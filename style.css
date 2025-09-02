@@ -69,7 +69,7 @@ body {
 }
 
 .hero-overlay h1 {
-  font-family: 'barber', 'Great Vibes', 'Dancing Script', cursive;
+  font-family: 'barber', 'Barber', 'barber-regular', 'barber-bold', 'Great Vibes', 'Dancing Script', cursive;
   font-weight: 400;
   font-size: clamp(2.5rem, 7vw, 5rem);
   margin: 0 0 2rem 0;
@@ -83,6 +83,8 @@ body {
   letter-spacing: 0.02em;
   text-transform: none;
   line-height: 1.3;
+  /* Forzar recarga de fuente */
+  font-display: swap;
   position: relative;
   overflow: visible;
 }

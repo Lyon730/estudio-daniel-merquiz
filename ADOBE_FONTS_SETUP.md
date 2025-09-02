@@ -48,5 +48,33 @@ Si Adobe Fonts no carga, se usará automáticamente:
 2. 'Dancing Script' (Google Fonts)
 3. cursive (fuente del sistema)
 
+## Resolución de problemas:
+
+### Si no ves el cambio de fuente:
+
+1. **Verificar el Kit ID:**
+   - Ve a tu proyecto en Adobe Fonts
+   - Copia exactamente el Kit ID (sin espacios extra)
+   - Verifica que el enlace funcione: `https://use.typekit.net/TU_KIT_ID.css`
+
+2. **Verificar el nombre de la fuente:**
+   - En Adobe Fonts, ve a tu proyecto
+   - Busca el nombre exacto bajo "CSS font-family names"
+   - Nombres comunes: `barber`, `Barber`, `barber-regular`
+
+3. **Limpiar caché del navegador:**
+   - Presiona `Ctrl + F5` (Windows) o `Cmd + Shift + R` (Mac)
+   - O abre las herramientas de desarrollador (F12) y recarga
+
+4. **Verificar en la consola del navegador:**
+   - Abre F12 → Console
+   - Busca errores relacionados con fonts
+   - Verifica que aparezca el log de fuentes disponibles
+
+5. **Probar con diferentes nombres:**
+   ```css
+   font-family: 'barber', 'Barber', 'barber-regular', 'barber-bold', fallbacks...
+   ```
+
 ## Nota:
 Adobe Fonts es gratuito con límites de uso. Para uso comercial intensivo, considera una suscripción Adobe Creative Cloud.

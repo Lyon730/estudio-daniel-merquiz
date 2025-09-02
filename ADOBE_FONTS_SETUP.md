@@ -38,9 +38,12 @@ En `index.html`, reemplaza `YOUR_KIT_ID` con tu Kit ID real:
 ```
 
 ## Nombres comunes de la fuente Barber:
-- `'barber'`
-- `'Barber'` 
-- `'barber-regular'`
+- `'Barber Complete'` ✅ (nombre correcto encontrado)
+- `'barber-complete'`
+- `'Barber Fill'`
+- `'Barber Outline'`
+
+**Nota importante:** En Adobe Fonts, verifica el nombre exacto en la sección "Fuentes" de tu proyecto.
 
 ## Fallbacks incluidos:
 Si Adobe Fonts no carga, se usará automáticamente:

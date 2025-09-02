@@ -6,31 +6,72 @@
   <title>Estudio Daniel Merquiz</title>
   <link rel="icon" type="image/png" href="assets/Barber-shop-logo.png" />
   
-  <!-- Adobe Fonts - Reemplaza YOUR_KIT_ID con tu ID de kit real -->
+  <!-- Adobe Fonts - Kit ID: mbt5esf -->
   <link rel="stylesheet" href="https://use.typekit.net/mbt5esf.css">
-  <!-- Ejemplo: <link rel="stylesheet" href="https://use.typekit.net/abc1def.css"> -->
-  
-  <!-- Script para diagnosticar fuentes cargadas -->
-  <script>
-    document.fonts.ready.then(function() {
-      console.log('Fuentes disponibles:');
-      document.fonts.forEach(function(font) {
-        if (font.family.toLowerCase().includes('barber')) {
-          console.log('Fuente Barber encontrada:', font.family);
-        }
-      });
-      
-      // Probar si la fuente está disponible
-      const testElement = document.createElement('div');
-      testElement.style.fontFamily = 'barber, serif';
-      document.body.appendChild(testElement);
-      const computedStyle = window.getComputedStyle(testElement);
-      console.log('Fuente calculada:', computedStyle.fontFamily);
-      document.body.removeChild(testElement);
-    });
-  </script>
   
   <link rel="stylesheet" href="style.css" />
+  
+  <!-- Script mejorado para diagnosticar fuentes -->
+  <script>
+    // Diagnóstico inmediato
+    console.log('🔍 Iniciando diagnóstico de fuentes...');
+    
+    // Verificar si el enlace de Adobe Fonts carga
+    fetch('https://use.typekit.net/mbt5esf.css')
+      .then(response => {
+        console.log('✅ Adobe Fonts CSS:', response.status === 200 ? 'CARGADO' : 'ERROR');
+        return response.text();
+      })
+      .then(css => {
+        console.log('📝 CSS de Adobe Fonts:', css.substring(0, 200) + '...');
+        
+        // Buscar nombres de fuentes en el CSS
+        const fontMatches = css.match(/font-family:[^;]+/g);
+        if (fontMatches) {
+          console.log('🎯 Familias de fuentes encontradas:', fontMatches);
+        }
+      })
+      .catch(error => {
+        console.error('❌ Error cargando Adobe Fonts:', error);
+      });
+    
+    // Diagnóstico cuando las fuentes estén listas
+    if (document.fonts) {
+      document.fonts.ready.then(function() {
+        console.log('📚 Fuentes del navegador listas');
+        console.log('📊 Total de fuentes cargadas:', document.fonts.size);
+        
+        // Listar todas las fuentes que contienen "barber"
+        let barberFonts = [];
+        document.fonts.forEach(function(font) {
+          if (font.family.toLowerCase().includes('barber')) {
+            barberFonts.push(font.family);
+          }
+        });
+        
+        console.log('🪒 Fuentes Barber encontradas:', barberFonts.length > 0 ? barberFonts : 'NINGUNA');
+        
+        // Probar detección de fuente específicamente "Barber Complete"
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        context.font = '72px serif';
+        const fallbackWidth = context.measureText('Estudio Daniel Merquiz').width;
+        context.font = '72px "Barber Complete", serif';
+        const testWidth = context.measureText('Estudio Daniel Merquiz').width;
+        
+        console.log('🔍 Test "Barber Complete":', testWidth !== fallbackWidth ? 'BARBER COMPLETE DETECTADA ✅' : 'USANDO FALLBACK ❌');
+      });
+    }
+    
+    // Diagnóstico después de 3 segundos (por si las fuentes tardan)
+    setTimeout(() => {
+      const h1 = document.querySelector('.hero-overlay h1');
+      if (h1) {
+        const computedStyle = window.getComputedStyle(h1);
+        console.log('🎨 Fuente aplicada al título:', computedStyle.fontFamily);
+      }
+    }, 3000);
+  </script>
 
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>

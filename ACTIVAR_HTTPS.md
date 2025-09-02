@@ -3,6 +3,16 @@
 ## ❌ Problema Actual:
 Tu sitio aparece como "No es seguro" porque usa HTTP en lugar de HTTPS.
 
+## 🚨 **PROBLEMA ACTUAL IDENTIFICADO:**
+
+### ❌ **Estás usando HTTP en lugar de HTTPS:**
+- URL actual: `http://estudiodanielmerquiz.com` ← NO SEGURO
+- URL correcta: `https://estudiodanielmerquiz.com` ← SEGURO
+
+### ✅ **SOLUCIÓN INMEDIATA:**
+1. **Cambiar manualmente**: En la barra de direcciones, cambia `http://` por `https://`
+2. **O activar Force HTTPS** en Netlify (recomendado)
+
 ## ✅ Solución (5 minutos):
 
 ### 1. 🌐 Ir a tu panel de Netlify

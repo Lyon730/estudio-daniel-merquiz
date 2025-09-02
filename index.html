@@ -38,7 +38,7 @@
         <ul>
           <li><a href="#inicio">Inicio</a></li>
           <li><a href="#servicios">Servicios</a></li>
-          <li><a href="#precios">Precios</a></li>
+          <li><a href="#productos">Productos</a></li>
           <li><a href="#reservas">Reservas</a></li>
           <li><a href="#contacto">Contacto</a></li>
           <li><a href="#galeria">Galería</a></li>
@@ -52,7 +52,7 @@
     <ul>
       <li><a href="#inicio">Inicio</a></li>
       <li><a href="#servicios">Servicios</a></li>
-      <li><a href="#precios">Precios</a></li>
+      <li><a href="#productos">Productos</a></li>
       <li><a href="#reservas">Reservas</a></li>
       <li><a href="#contacto">Contacto</a></li>
       <li><a href="#galeria">Galería</a></li>
@@ -62,7 +62,20 @@
   <main>
     <section id="inicio"><h2>Bienvenidos</h2><p>Tu estilo comienza aquí.</p></section>
     <section id="servicios"><h2>Servicios</h2><p>Cortes, afeitados y más.</p></section>
-    <section id="precios"><h2>Precios</h2><p>Consulta nuestras tarifas.</p></section>
+    <section id="productos" class="productos">
+      <div class="container">
+        <h2>🛒 Productos</h2>
+        <p>Descubre nuestra selección de productos profesionales para el cuidado del cabello</p>
+        
+        <div id="productos-grid" class="productos-grid">
+          <!-- Los productos se cargarán dinámicamente aquí -->
+        </div>
+        
+        <div id="ver-mas-container" class="ver-mas-container" style="display: none;">
+          <button id="ver-mas-btn" class="ver-mas-btn" onclick="verMasProductos()">Ver más productos</button>
+        </div>
+      </div>
+    </section>
     <section id="reservas">
       <h2>Reservas</h2>
       <form id="form-reserva">
@@ -207,6 +220,7 @@
       <button class="admin-tab-button active" onclick="showAdminTab('horas-tab')">Gestionar Horas de Atención</button>
       <button class="admin-tab-button" onclick="showAdminTab('reservas-tab')">Gestionar Reservas</button>
       <button class="admin-tab-button" onclick="showAdminTab('galeria-tab')">Gestionar Galería</button>
+      <button class="admin-tab-button" onclick="showAdminTab('productos-tab')">Gestionar Productos</button>
     </div>
     
     <div class="admin-content">
@@ -312,6 +326,72 @@
                 <p>📷 No hay imágenes en la galería aún</p>
                 <p>Sube algunas fotos para comenzar</p>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pestaña Productos -->
+      <div id="productos-tab" class="admin-tab-content" style="display:none;">
+        <h2>Gestionar Productos</h2>
+        <p>Administra los productos que se venden en la barbería.</p>
+        
+        <!-- Formulario para agregar productos -->
+        <div class="producto-form-section">
+          <h3>➕ Agregar Nuevo Producto</h3>
+          <form id="producto-form" class="producto-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="producto-nombre">Nombre del Producto</label>
+                <input type="text" id="producto-nombre" required placeholder="Ej: Pomada para cabello">
+              </div>
+              <div class="form-group">
+                <label for="producto-precio">Precio ($)</label>
+                <input type="number" id="producto-precio" step="0.01" min="0" required placeholder="15.99">
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="producto-descripcion">Descripción</label>
+              <textarea id="producto-descripcion" rows="3" required placeholder="Describe las características del producto..."></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label for="producto-imagen">Imagen del Producto</label>
+              <div class="producto-upload-area" id="producto-upload-area">
+                <div class="upload-content">
+                  <span class="upload-icon">🖼️</span>
+                  <p>Haz clic para seleccionar imagen</p>
+                  <small>JPG, PNG, WebP (máx. 2MB)</small>
+                </div>
+                <input type="file" id="producto-imagen-input" accept=".jpg,.jpeg,.png,.webp" hidden>
+              </div>
+              <div class="imagen-preview" id="imagen-preview" style="display:none;">
+                <img id="preview-img" alt="Vista previa">
+                <button type="button" class="remove-preview" onclick="removeImagePreview()">✕</button>
+              </div>
+            </div>
+            
+            <div class="form-actions">
+              <button type="submit" class="btn-primary">Agregar Producto</button>
+              <button type="button" id="cancel-edit" class="btn-secondary" style="display:none;" onclick="cancelEdit()">Cancelar Edición</button>
+            </div>
+          </form>
+        </div>
+        
+        <!-- Lista de productos existentes -->
+        <div class="productos-list-section">
+          <div class="section-header">
+            <h3>📦 Productos Actuales</h3>
+            <div class="productos-stats" id="productos-stats">
+              <span class="productos-count">0 productos</span>
+            </div>
+          </div>
+          
+          <div class="productos-admin-grid" id="productos-admin-grid">
+            <div class="no-productos-admin">
+              <p>📦 No hay productos registrados aún</p>
+              <p>Agrega algunos productos para comenzar</p>
             </div>
           </div>
         </div>

@@ -288,6 +288,402 @@ let horariosGuardados = {}; // horarios por fecha
 let reservasOcupadas = {}; // reservas por slot
 let datosListos = false; // nuevo flag
 let galeriaImagenes = []; // Array para almacenar imágenes de la galería
+let productosDisponibles = []; // Array para almacenar productos de la barbería
+let editingProductId = null;
+
+// ===== FUNCIONES DE PRODUCTOS =====
+
+// Inicializar productos
+function initProductos() {
+  // Cargar productos desde localStorage o Firebase
+  loadProductos();
+  
+  // Event listeners para formulario de productos
+  const productoForm = document.getElementById('producto-form');
+  const productoImagenInput = document.getElementById('producto-imagen-input');
+  const productoUploadArea = document.getElementById('producto-upload-area');
+  
+  if (productoForm) {
+    productoForm.addEventListener('submit', handleProductoSubmit);
+  }
+  
+  if (productoImagenInput) {
+    productoImagenInput.addEventListener('change', handleProductoImageSelect);
+  }
+  
+  if (productoUploadArea) {
+    productoUploadArea.addEventListener('click', () => productoImagenInput.click());
+    
+    // Drag and drop para imágenes de productos
+    productoUploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      productoUploadArea.classList.add('drag-over');
+    });
+    
+    productoUploadArea.addEventListener('dragleave', () => {
+      productoUploadArea.classList.remove('drag-over');
+    });
+    
+    productoUploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      productoUploadArea.classList.remove('drag-over');
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        productoImagenInput.files = files;
+        handleProductoImageSelect();
+      }
+    });
+  }
+}
+
+// Manejar selección de imagen del producto
+function handleProductoImageSelect() {
+  const input = document.getElementById('producto-imagen-input');
+  const preview = document.getElementById('imagen-preview');
+  const previewImg = document.getElementById('preview-img');
+  
+  if (input.files && input.files[0]) {
+    const file = input.files[0];
+    
+    // Validar tamaño (2MB máximo)
+    if (file.size > 2 * 1024 * 1024) {
+      alert('La imagen es demasiado grande. Máximo 2MB permitido.');
+      input.value = '';
+      return;
+    }
+    
+    // Mostrar vista previa
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      previewImg.src = e.target.result;
+      preview.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+// Remover vista previa de imagen
+function removeImagePreview() {
+  const input = document.getElementById('producto-imagen-input');
+  const preview = document.getElementById('imagen-preview');
+  
+  input.value = '';
+  preview.style.display = 'none';
+}
+
+// Manejar envío del formulario de producto
+async function handleProductoSubmit(e) {
+  e.preventDefault();
+  
+  const nombre = document.getElementById('producto-nombre').value.trim();
+  const precio = parseFloat(document.getElementById('producto-precio').value);
+  const descripcion = document.getElementById('producto-descripcion').value.trim();
+  const imagenInput = document.getElementById('producto-imagen-input');
+  
+  if (!nombre || !precio || !descripcion) {
+    alert('Por favor completa todos los campos obligatorios.');
+    return;
+  }
+  
+  try {
+    let imagenUrl = null;
+    
+    // Si hay imagen, subirla
+    if (imagenInput.files && imagenInput.files[0]) {
+      imagenUrl = await uploadProductoImage(imagenInput.files[0]);
+    }
+    
+    const producto = {
+      id: editingProductId || Date.now().toString(),
+      nombre,
+      precio,
+      descripcion,
+      imagen: imagenUrl,
+      fechaCreacion: editingProductId ? 
+        productosDisponibles.find(p => p.id === editingProductId)?.fechaCreacion : 
+        new Date().toISOString()
+    };
+    
+    if (editingProductId) {
+      // Editar producto existente
+      const index = productosDisponibles.findIndex(p => p.id === editingProductId);
+      productosDisponibles[index] = producto;
+    } else {
+      // Agregar nuevo producto
+      productosDisponibles.push(producto);
+    }
+    
+    // Guardar en localStorage y Firebase
+    await saveProductos();
+    
+    // Actualizar UI
+    updateProductosUI();
+    updateProductosSection();
+    
+    // Limpiar formulario
+    resetProductoForm();
+    
+    alert(editingProductId ? 'Producto actualizado exitosamente' : 'Producto agregado exitosamente');
+    
+  } catch (error) {
+    console.error('Error al guardar producto:', error);
+    alert('Error al guardar el producto. Por favor intenta de nuevo.');
+  }
+}
+
+// Subir imagen de producto
+async function uploadProductoImage(file) {
+  // Si Cloudinary está disponible, usarlo
+  if (typeof cloudinary !== 'undefined' && cloudinary.config) {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', 'productos_preset'); // Preset específico para productos
+      
+      const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudinary.config().cloud_name}/image/upload`, {
+        method: 'POST',
+        body: formData
+      });
+      
+      const data = await response.json();
+      return data.secure_url;
+    } catch (error) {
+      console.warn('Error con Cloudinary, usando almacenamiento local:', error);
+    }
+  }
+  
+  // Fallback a localStorage
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      resolve(e.target.result);
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// Cargar productos
+function loadProductos() {
+  try {
+    // Intentar cargar desde localStorage
+    const productosLocal = localStorage.getItem('productosDisponibles');
+    if (productosLocal) {
+      productosDisponibles = JSON.parse(productosLocal);
+    }
+    
+    // Si Firebase está disponible, cargar desde ahí
+    if (database) {
+      database.ref('productos').on('value', (snapshot) => {
+        const productosFirebase = snapshot.val();
+        if (productosFirebase) {
+          productosDisponibles = Object.values(productosFirebase);
+          localStorage.setItem('productosDisponibles', JSON.stringify(productosDisponibles));
+          updateProductosUI();
+          updateProductosSection();
+        }
+      });
+    }
+    
+  } catch (error) {
+    console.error('Error cargando productos:', error);
+  }
+}
+
+// Guardar productos
+async function saveProductos() {
+  // Guardar en localStorage
+  localStorage.setItem('productosDisponibles', JSON.stringify(productosDisponibles));
+  
+  // Guardar en Firebase si está disponible
+  if (database) {
+    const productosObj = {};
+    productosDisponibles.forEach(producto => {
+      productosObj[producto.id] = producto;
+    });
+    
+    try {
+      await database.ref('productos').set(productosObj);
+    } catch (error) {
+      console.warn('Error guardando en Firebase:', error);
+    }
+  }
+}
+
+// Actualizar UI del panel de administración
+function updateProductosUI() {
+  const grid = document.getElementById('productos-admin-grid');
+  const stats = document.getElementById('productos-stats');
+  
+  if (!grid || !stats) return;
+  
+  // Actualizar estadísticas
+  stats.innerHTML = `<span class="productos-count">${productosDisponibles.length} productos</span>`;
+  
+  // Limpiar grid
+  grid.innerHTML = '';
+  
+  if (productosDisponibles.length === 0) {
+    grid.innerHTML = `
+      <div class="no-productos-admin">
+        <p>📦 No hay productos registrados aún</p>
+        <p>Agrega algunos productos para comenzar</p>
+      </div>
+    `;
+    return;
+  }
+  
+  // Renderizar productos
+  productosDisponibles.forEach(producto => {
+    const card = document.createElement('div');
+    card.className = 'producto-admin-card';
+    card.innerHTML = `
+      ${producto.imagen ? `<img src="${producto.imagen}" alt="${producto.nombre}" class="producto-admin-imagen">` : '<div class="producto-admin-imagen" style="display:flex;align-items:center;justify-content:center;color:#666;font-size:2rem;">📦</div>'}
+      <div class="producto-admin-info">
+        <div class="producto-admin-nombre">${producto.nombre}</div>
+        <div class="producto-admin-descripcion">${producto.descripcion}</div>
+        <div class="producto-admin-precio">$${producto.precio.toFixed(2)}</div>
+        <div class="producto-admin-actions">
+          <button class="btn-edit" onclick="editProducto('${producto.id}')">Editar</button>
+          <button class="btn-delete" onclick="deleteProducto('${producto.id}')">Eliminar</button>
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+// Actualizar sección pública de productos
+function updateProductosSection() {
+  const grid = document.getElementById('productos-grid');
+  if (!grid) return;
+  
+  // Limpiar grid
+  grid.innerHTML = '';
+  
+  if (productosDisponibles.length === 0) {
+    grid.innerHTML = `
+      <div class="no-productos">
+        <div class="no-productos-icon">📦</div>
+        <h3>Próximamente nuevos productos</h3>
+        <p>Estamos preparando una selección especial para ti</p>
+      </div>
+    `;
+    return;
+  }
+  
+  // Mostrar productos (máximo 6 inicialmente)
+  const productosParaMostrar = productosDisponibles.slice(0, 6);
+  
+  productosParaMostrar.forEach(producto => {
+    const card = document.createElement('div');
+    card.className = 'producto-card';
+    card.innerHTML = `
+      ${producto.imagen ? `<img src="${producto.imagen}" alt="${producto.nombre}" class="producto-imagen">` : '<div class="producto-imagen" style="display:flex;align-items:center;justify-content:center;color:#666;font-size:3rem;">📦</div>'}
+      <div class="producto-info">
+        <h3 class="producto-nombre">${producto.nombre}</h3>
+        <p class="producto-descripcion">${producto.descripcion}</p>
+        <div class="producto-precio">$${producto.precio.toFixed(2)}</div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+  
+  // Mostrar botón "Ver más" si hay más productos
+  const verMasContainer = document.querySelector('.ver-mas-container');
+  if (verMasContainer) {
+    if (productosDisponibles.length > 6) {
+      verMasContainer.style.display = 'block';
+    } else {
+      verMasContainer.style.display = 'none';
+    }
+  }
+}
+
+// Editar producto
+function editProducto(id) {
+  const producto = productosDisponibles.find(p => p.id === id);
+  if (!producto) return;
+  
+  // Llenar formulario con datos del producto
+  document.getElementById('producto-nombre').value = producto.nombre;
+  document.getElementById('producto-precio').value = producto.precio;
+  document.getElementById('producto-descripcion').value = producto.descripcion;
+  
+  // Si tiene imagen, mostrar vista previa
+  if (producto.imagen) {
+    const preview = document.getElementById('imagen-preview');
+    const previewImg = document.getElementById('preview-img');
+    previewImg.src = producto.imagen;
+    preview.style.display = 'block';
+  }
+  
+  // Cambiar modo a edición
+  editingProductId = id;
+  document.querySelector('.btn-primary').textContent = 'Actualizar Producto';
+  document.getElementById('cancel-edit').style.display = 'inline-block';
+  
+  // Cambiar a pestaña de productos
+  showAdminTab('productos-tab');
+  
+  // Scroll al formulario
+  document.getElementById('producto-form').scrollIntoView({ behavior: 'smooth' });
+}
+
+// Cancelar edición
+function cancelEdit() {
+  resetProductoForm();
+}
+
+// Eliminar producto
+function deleteProducto(id) {
+  const producto = productosDisponibles.find(p => p.id === id);
+  if (!producto) return;
+  
+  if (confirm(`¿Estás seguro de que quieres eliminar "${producto.nombre}"?`)) {
+    productosDisponibles = productosDisponibles.filter(p => p.id !== id);
+    saveProductos();
+    updateProductosUI();
+    updateProductosSection();
+  }
+}
+
+// Resetear formulario de producto
+function resetProductoForm() {
+  document.getElementById('producto-form').reset();
+  removeImagePreview();
+  editingProductId = null;
+  document.querySelector('.btn-primary').textContent = 'Agregar Producto';
+  document.getElementById('cancel-edit').style.display = 'none';
+}
+
+// Mostrar más productos
+function verMasProductos() {
+  const grid = document.getElementById('productos-grid');
+  if (!grid) return;
+  
+  // Limpiar y mostrar todos los productos
+  grid.innerHTML = '';
+  
+  productosDisponibles.forEach(producto => {
+    const card = document.createElement('div');
+    card.className = 'producto-card';
+    card.innerHTML = `
+      ${producto.imagen ? `<img src="${producto.imagen}" alt="${producto.nombre}" class="producto-imagen">` : '<div class="producto-imagen" style="display:flex;align-items:center;justify-content:center;color:#666;font-size:3rem;">📦</div>'}
+      <div class="producto-info">
+        <h3 class="producto-nombre">${producto.nombre}</h3>
+        <p class="producto-descripcion">${producto.descripcion}</p>
+        <div class="producto-precio">$${producto.precio.toFixed(2)}</div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+  
+  // Ocultar botón "Ver más"
+  const verMasContainer = document.querySelector('.ver-mas-container');
+  if (verMasContainer) {
+    verMasContainer.style.display = 'none';
+  }
+}
 let currentSlide = 0; // Índice actual del carrusel
 console.log('[INIT] Variables globales declaradas.');
 
@@ -1026,6 +1422,9 @@ document.addEventListener('DOMContentLoaded', async function() {
   // === INICIALIZAR DATOS Y CONFIGURACIÓN ===
   // Cargar datos desde Firebase
   await inicializarDatos();
+  
+  // Inicializar productos
+  initProductos();
   
   // Configurar fecha mínima para reservas
   const fechaInput = document.getElementById('fecha-reserva');

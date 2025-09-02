@@ -6,8 +6,8 @@
   <title>Estudio Daniel Merquiz</title>
   <link rel="icon" type="image/png" href="assets/Barber-shop-logo.png" />
   
-  <!-- Adobe Fonts - Kit ID: mbt5esf -->
-  <link rel="stylesheet" href="https://use.typekit.net/mbt5esf.css">
+  <!-- Adobe Fonts - Kit ID: mcd8tni (Permanent Marker) -->
+  <link rel="stylesheet" href="https://use.typekit.net/mcd8tni.css">
   
   <link rel="stylesheet" href="style.css" />
   
@@ -17,7 +17,7 @@
     console.log('🔍 Iniciando diagnóstico de fuentes...');
     
     // Verificar si el enlace de Adobe Fonts carga
-    fetch('https://use.typekit.net/mbt5esf.css')
+    fetch('https://use.typekit.net/mcd8tni.css')
       .then(response => {
         console.log('✅ Adobe Fonts CSS:', response.status === 200 ? 'CARGADO' : 'ERROR');
         return response.text();
@@ -41,25 +41,25 @@
         console.log('📚 Fuentes del navegador listas');
         console.log('📊 Total de fuentes cargadas:', document.fonts.size);
         
-        // Listar todas las fuentes que contienen "barber"
-        let barberFonts = [];
+        // Listar todas las fuentes que contienen "permanent" o "marker"
+        let permanentMarkerFonts = [];
         document.fonts.forEach(function(font) {
-          if (font.family.toLowerCase().includes('barber')) {
-            barberFonts.push(font.family);
+          if (font.family.toLowerCase().includes('permanent') || font.family.toLowerCase().includes('marker')) {
+            permanentMarkerFonts.push(font.family);
           }
         });
         
-        console.log('🪒 Fuentes Barber encontradas:', barberFonts.length > 0 ? barberFonts : 'NINGUNA');
+        console.log('✍️ Fuentes Permanent Marker encontradas:', permanentMarkerFonts.length > 0 ? permanentMarkerFonts : 'NINGUNA');
         
-        // Probar detección de fuente específicamente "Barber Complete"
+        // Probar detección de fuente específicamente "Permanent Marker"
         const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d');
         context.font = '72px serif';
-        const fallbackWidth = context.measureText('Estudio Daniel Merquiz').width;
-        context.font = '72px "Barber Complete", serif';
-        const testWidth = context.measureText('Estudio Daniel Merquiz').width;
+        const fallbackWidth = context.measureText('ESTUDIO DANIEL MERQUIZ').width;
+        context.font = '72px "permanent-marker", serif';
+        const testWidth = context.measureText('ESTUDIO DANIEL MERQUIZ').width;
         
-        console.log('🔍 Test "Barber Complete":', testWidth !== fallbackWidth ? 'BARBER COMPLETE DETECTADA ✅' : 'USANDO FALLBACK ❌');
+        console.log('🔍 Test "permanent-marker":', testWidth !== fallbackWidth ? 'PERMANENT MARKER DETECTADA ✅' : 'USANDO FALLBACK ❌');
       });
     }
     

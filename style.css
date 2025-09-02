@@ -69,7 +69,7 @@ body {
 }
 
 .hero-overlay h1 {
-  font-family: fastpen, sans-serif;
+  font-family: "permanent-marker", "Permanent Marker", fastpen, cursive;
   font-style: normal;
   font-weight: 400;
   font-size: clamp(2.5rem, 7vw, 5rem);

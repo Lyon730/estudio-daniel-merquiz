@@ -536,12 +536,13 @@ function updateProductosUI() {
   productosDisponibles.forEach(producto => {
     const card = document.createElement('div');
     card.className = 'producto-admin-card';
+    const precioFormateado = formatearPrecio(producto.precio);
     card.innerHTML = `
       ${producto.imagen ? `<img src="${producto.imagen}" alt="${producto.nombre}" class="producto-admin-imagen">` : '<div class="producto-admin-imagen" style="display:flex;align-items:center;justify-content:center;color:#666;font-size:2rem;">📦</div>'}
       <div class="producto-admin-info">
         <div class="producto-admin-nombre">${producto.nombre}</div>
         <div class="producto-admin-descripcion">${producto.descripcion}</div>
-        <div class="producto-admin-precio">$${producto.precio.toFixed(2)}</div>
+        <div class="producto-admin-precio">${precioFormateado}</div>
         <div class="producto-admin-actions">
           <button class="btn-edit" onclick="editProducto('${producto.id}')">Editar</button>
           <button class="btn-delete" onclick="deleteProducto('${producto.id}')">Eliminar</button>
@@ -577,12 +578,13 @@ function updateProductosSection() {
   productosParaMostrar.forEach(producto => {
     const card = document.createElement('div');
     card.className = 'producto-card';
+    const precioFormateado = formatearPrecio(producto.precio);
     card.innerHTML = `
       ${producto.imagen ? `<img src="${producto.imagen}" alt="${producto.nombre}" class="producto-imagen">` : '<div class="producto-imagen" style="display:flex;align-items:center;justify-content:center;color:#666;font-size:3rem;">📦</div>'}
       <div class="producto-info">
         <h3 class="producto-nombre">${producto.nombre}</h3>
         <p class="producto-descripcion">${producto.descripcion}</p>
-        <div class="producto-precio">$${producto.precio.toFixed(2)}</div>
+        <div class="producto-precio">${precioFormateado}</div>
       </div>
     `;
     grid.appendChild(card);
@@ -667,12 +669,13 @@ function verMasProductos() {
   productosDisponibles.forEach(producto => {
     const card = document.createElement('div');
     card.className = 'producto-card';
+    const precioFormateado = formatearPrecio(producto.precio);
     card.innerHTML = `
       ${producto.imagen ? `<img src="${producto.imagen}" alt="${producto.nombre}" class="producto-imagen">` : '<div class="producto-imagen" style="display:flex;align-items:center;justify-content:center;color:#666;font-size:3rem;">📦</div>'}
       <div class="producto-info">
         <h3 class="producto-nombre">${producto.nombre}</h3>
         <p class="producto-descripcion">${producto.descripcion}</p>
-        <div class="producto-precio">$${producto.precio.toFixed(2)}</div>
+        <div class="producto-precio">${precioFormateado}</div>
       </div>
     `;
     grid.appendChild(card);
@@ -683,6 +686,16 @@ function verMasProductos() {
   if (verMasContainer) {
     verMasContainer.style.display = 'none';
   }
+}
+
+// Formatear precio en pesos chilenos
+function formatearPrecio(precio) {
+  return new Intl.NumberFormat('es-CL', {
+    style: 'currency',
+    currency: 'CLP',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(precio);
 }
 let currentSlide = 0; // Índice actual del carrusel
 console.log('[INIT] Variables globales declaradas.');

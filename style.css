@@ -69,23 +69,23 @@ body {
 }
 
 .hero-overlay h1 {
-  font-family: fastpen, sans-serif;
+  font-family: "permanent-marker", sans-serif;
   font-style: normal;
   font-weight: 400;
+  font-size: clamp(2.5rem, 7vw, 5rem);
   margin: 0 0 2rem 0;
   padding: 0.5rem 0;
-  color: #000000;
-  -webkit-text-stroke: 2px #ffffff;
-  text-stroke: 2px #ffffff;
+  color: #00ffff;
   text-shadow: 
-    0 0 10px rgba(255, 255, 255, 0.8),
-    0 2px 4px rgba(0, 0, 0, 0.3),
-    2px 2px 0px #ffffff,
-    -2px -2px 0px #ffffff,
-    2px -2px 0px #ffffff,
-    -2px 2px 0px #ffffff;
+    0 0 5px #00ffff,
+    0 0 10px #00ffff,
+    0 0 15px #00ffff,
+    0 0 20px #00ffff,
+    0 0 35px #00ffff,
+    0 0 40px #00ffff,
+    0 2px 0 #004d4d;
   letter-spacing: 0.02em;
-  text-transform: none;
+  text-transform: uppercase;
   line-height: 1.1;
   font-display: swap;
   position: relative;
@@ -93,6 +93,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  animation: neonFlicker 4s infinite;
 }
 
 /* Estilos para las dos líneas del título */
@@ -101,12 +102,78 @@ body {
   font-size: 0.7em;
   letter-spacing: 0.1em;
   margin-bottom: -0.1em;
+  animation: neonFlicker 4s infinite, neonFlicker2 7s infinite;
 }
 
 .titulo-linea-2 {
   display: block;
   font-size: 1em;
   letter-spacing: 0.05em;
+  animation: neonFlicker 4s infinite, neonFlicker3 5s infinite;
+}
+
+/* Animación de parpadeo de neón con problemas eléctricos */
+@keyframes neonFlicker {
+  0%, 18%, 22%, 25%, 53%, 57%, 100% {
+    color: #00ffff;
+    text-shadow: 
+      0 0 5px #00ffff,
+      0 0 10px #00ffff,
+      0 0 15px #00ffff,
+      0 0 20px #00ffff,
+      0 0 35px #00ffff,
+      0 0 40px #00ffff,
+      0 2px 0 #004d4d;
+  }
+  
+  19%, 21%, 23%, 24%, 54%, 56% {
+    color: #004d4d;
+    text-shadow: 
+      0 0 2px #004d4d,
+      0 2px 0 #001a1a;
+  }
+  
+  /* Parpadeos más rápidos para simular problemas eléctricos */
+  26%, 27%, 28% {
+    color: #00cccc;
+    text-shadow: 
+      0 0 3px #00cccc,
+      0 0 8px #00cccc,
+      0 0 12px #00cccc,
+      0 2px 0 #003333;
+  }
+  
+  58%, 59%, 60%, 61% {
+    color: #0080ff;
+    text-shadow: 
+      0 0 4px #0080ff,
+      0 0 9px #0080ff,
+      0 0 14px #0080ff,
+      0 2px 0 #002d66;
+  }
+}
+
+/* Animación adicional para crear más irregularidad */
+@keyframes neonFlicker2 {
+  0%, 100% { opacity: 1; }
+  15% { opacity: 0.3; }
+  16% { opacity: 1; }
+  35% { opacity: 0.8; }
+  36% { opacity: 1; }
+  65% { opacity: 0.2; }
+  66% { opacity: 0.6; }
+  67% { opacity: 1; }
+}
+
+@keyframes neonFlicker3 {
+  0%, 100% { opacity: 1; }
+  10% { opacity: 0.4; }
+  11% { opacity: 1; }
+  45% { opacity: 0.7; }
+  46% { opacity: 1; }
+  70% { opacity: 0.1; }
+  71% { opacity: 0.5; }
+  72% { opacity: 1; }
 }
 
 .hero-overlay nav ul {
@@ -216,26 +283,28 @@ body {
     margin-bottom: 1.5rem;
     line-height: 1.1;
     padding: 0.8rem 0;
-    color: #000000;
-    -webkit-text-stroke: 1.5px #ffffff;
-    text-stroke: 1.5px #ffffff;
+    color: #00ffff;
     text-shadow: 
-      0 0 8px rgba(255, 255, 255, 0.8),
-      0 1px 3px rgba(0, 0, 0, 0.3),
-      1px 1px 0px #ffffff,
-      -1px -1px 0px #ffffff,
-      1px -1px 0px #ffffff,
-      -1px 1px 0px #ffffff;
+      0 0 4px #00ffff,
+      0 0 8px #00ffff,
+      0 0 12px #00ffff,
+      0 0 16px #00ffff,
+      0 0 25px #00ffff,
+      0 0 30px #00ffff,
+      0 2px 0 #004d4d;
+    animation: neonFlicker 4s infinite;
   }
   
   .titulo-linea-1 {
     font-size: 0.6em;
     letter-spacing: 0.15em;
+    animation: neonFlicker 4s infinite, neonFlicker2 7s infinite;
   }
   
   .titulo-linea-2 {
     font-size: 1em;
     letter-spacing: 0.05em;
+    animation: neonFlicker 4s infinite, neonFlicker3 5s infinite;
   }
   
   .sticky-nav ul {

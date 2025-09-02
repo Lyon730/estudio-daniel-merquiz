@@ -76,45 +76,33 @@ body {
   padding: 0.5rem 0;
   color: #f5f5dc;
   text-shadow: 
-    0 0 30px rgba(245, 245, 220, 0.8),
-    0 6px 12px rgba(0, 0, 0, 0.9),
-    0 3px 6px rgba(0, 0, 0, 1),
-    0 12px 24px rgba(0, 0, 0, 0.8);
+    0 2px 8px rgba(0, 0, 0, 0.9),
+    0 1px 4px rgba(0, 0, 0, 1),
+    0 4px 12px rgba(0, 0, 0, 0.7);
   letter-spacing: 0.02em;
   text-transform: none;
-  line-height: 1.3;
-  /* Forzar recarga de fuente */
+  line-height: 1.1;
   font-display: swap;
   position: relative;
   overflow: visible;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0.9;
 }
 
-.hero-overlay h1::after {
-  content: 'Estudio Daniel Merquiz';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    transparent 30%,
-    rgba(255, 255, 255, 0.8) 50%,
-    transparent 70%,
-    transparent 100%
-  );
-  background-size: 200% 100%;
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: shine 3s ease-in-out infinite;
-  pointer-events: none;
+/* Estilos para las dos líneas del título */
+.titulo-linea-1 {
+  display: block;
+  font-size: 0.7em;
+  letter-spacing: 0.1em;
+  margin-bottom: -0.1em;
 }
 
-@keyframes shine {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+.titulo-linea-2 {
+  display: block;
+  font-size: 1em;
+  letter-spacing: 0.05em;
 }
 
 .hero-overlay nav ul {
@@ -222,13 +210,23 @@ body {
   .hero-overlay h1 {
     font-size: clamp(2rem, 9vw, 3.5rem);
     margin-bottom: 1.5rem;
-    line-height: 1.4;
+    line-height: 1.1;
     padding: 0.8rem 0;
     text-shadow: 
-      0 0 25px rgba(245, 245, 220, 0.8),
-      0 4px 8px rgba(0, 0, 0, 0.9),
-      0 2px 4px rgba(0, 0, 0, 1),
-      0 8px 16px rgba(0, 0, 0, 0.7);
+      0 2px 6px rgba(0, 0, 0, 0.9),
+      0 1px 3px rgba(0, 0, 0, 1),
+      0 4px 10px rgba(0, 0, 0, 0.7);
+    opacity: 0.9;
+  }
+  
+  .titulo-linea-1 {
+    font-size: 0.6em;
+    letter-spacing: 0.15em;
+  }
+  
+  .titulo-linea-2 {
+    font-size: 1em;
+    letter-spacing: 0.05em;
   }
   
   .sticky-nav ul {

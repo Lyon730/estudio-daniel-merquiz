@@ -270,118 +270,372 @@
         <button id="ver-mas-btn" class="ver-mas-btn" onclick="verMasProductos()">Ver más productos</button>
       </div>
     </section>
-    <section id="reservas">
-      <h2>Reservas</h2>
-      <form id="form-reserva">
-        <input type="text" id="nombre" placeholder="Tu nombre" required>
-        <input type="tel" id="telefono" placeholder="Tu teléfono" required>
-        <input type="date" id="fecha-reserva" placeholder="Selecciona una fecha" required onchange="mostrarHorasDisponibles()">
+    <section id="reservas" class="reservas">
+      <div class="container">
+        <h2>Reserva tu Cita</h2>
+        <p class="reservas-intro">Agenda tu cita de manera fácil y rápida. Elige la fecha y horario que mejor te convenga.</p>
         
-        <!-- Container para mostrar las horas disponibles -->
-        <div id="horas-disponibles-container" style="display:none;">
-          <h3>Horarios Disponibles</h3>
-          <div id="horas-disponibles-grid" class="horas-grid">
-            <!-- Las horas se mostrarán aquí dinámicamente -->
-          </div>
-          <input type="hidden" id="hora-seleccionada" required>
-        </div>
-        
-        <button type="submit" id="btn-reservar" disabled>Reservar</button>
-      </form>
-      <a class="whatsapp-button" id="wa-btn" href="https://wa.me/56996774738" target="_blank" rel="noopener">Agendar por WhatsApp</a>
-    </section>
-    <section id="contacto">
-      <h2>Contacto</h2>
-      <p>Ubícanos en redes o visítanos en cualquiera de nuestros locales.</p>
-      
-      <!-- Redes sociales -->
-      <div class="social-media">
-        <h3>📱 Síguenos en Instagram</h3>
-        <a href="https://www.instagram.com/estudio.danielmerquiz?igsh=MWxvMWs4emtld3dpaQ==" target="_blank" rel="noopener" class="instagram-link">
-          @estudio.danielmerquiz
-        </a>
-      </div>
-      
-      <div class="locations-container">
-        <!-- Primera ubicación - El Carmen -->
-        <div class="location-item">
-          <div class="contact-info">
-            <div class="contact-details">
-              <h3>📍 Estudio El Carmen</h3>
-              <p><strong>Dirección:</strong> Calle 16 de Julio #752</p>
-              <p>Te esperamos en nuestro moderno estudio para brindarte la mejor experiencia.</p>
+        <div class="reservas-content">
+          <div class="reservas-info">
+            <h3>🕐 Horarios de Atención</h3>
+            <div class="horarios">
+              <div class="dia">
+                <span class="dia-nombre">Lunes a Viernes</span>
+                <span class="horario">09:00 - 19:00</span>
+              </div>
+              <div class="dia">
+                <span class="dia-nombre">Sábados</span>
+                <span class="horario">09:00 - 18:00</span>
+              </div>
+              <div class="dia">
+                <span class="dia-nombre">Domingos</span>
+                <span class="horario">10:00 - 16:00</span>
+              </div>
             </div>
             
-            <div class="map-container">
-              <iframe 
-                src="https://www.google.com/maps/embed?pb=!4v1755521355102!6m8!1m7!1soDmV8t-2M72Xu6LA5mXOIA!2m2!1d-36.89990786801867!2d-72.00504877342019!3f268.65512!4f1.1345254984292978!5f0.7820865974627469"
-                width="100%" 
-                height="300" 
-                style="border:0;" 
-                allowfullscreen="" 
-                loading="lazy" 
-                referrerpolicy="no-referrer-when-downgrade">
-              </iframe>
-            </div>
-          </div>
-        </div>
-
-        <!-- Segunda ubicación - Chillán -->
-        <div class="location-item">
-          <div class="contact-info">
-            <div class="contact-details">
-              <h3>📍 Estudio Chillán</h3>
-              <p><strong>Dirección:</strong> Volcán Lascar #1274</p>
-              <p>Nuestro segundo estudio con la misma calidad y atención personalizada.</p>
+            <div class="reserva-beneficios">
+              <h4>✅ Beneficios de Reservar</h4>
+              <ul>
+                <li>🎯 Horario garantizado</li>
+                <li>⏰ Sin tiempo de espera</li>
+                <li>💬 Recordatorio por WhatsApp</li>
+                <li>🔄 Fácil reprogramación</li>
+              </ul>
             </div>
             
-            <div class="map-container">
-              <iframe 
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d800.5587188739297!2d-72.08288393046764!3d-36.62073262189544!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x966929c5f85ae385%3A0xc5a55d8eb678e71!2zVm9sY8OhbiBMYXNjYXIgMTI3NCwgMzgxMTQyNyBDaGlsbMOhbiwgw5F1Ymxl!5e0!3m2!1ses-419!2scl!4v1754944589868!5m2!1ses-419!2scl"
-                width="100%" 
-                height="300" 
-                style="border:0;" 
-                allowfullscreen="" 
-                loading="lazy" 
-                referrerpolicy="no-referrer-when-downgrade">
-              </iframe>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-    <section id="galeria">
-      <h2>Galería</h2>
-      <p>Descubre nuestros mejores trabajos y estilos.</p>
-      
-      <!-- Carrusel de imágenes -->
-      <div class="gallery-carousel-container">
-        <div class="gallery-carousel" id="gallery-carousel">
-          <div class="no-gallery-images" id="no-gallery-images">
-            <div class="no-images-message">
-              <span class="gallery-icon">📷</span>
-              <h3>Galería en construcción</h3>
-              <p>Pronto podrás ver aquí nuestros mejores trabajos y estilos.</p>
+            <div class="reserva-nota">
+              <p><strong>📞 ¿Prefieres llamar?</strong><br>
+              También puedes agendar directamente por teléfono o WhatsApp para una atención más personalizada.</p>
             </div>
           </div>
           
-          <!-- Las imágenes se cargarán dinámicamente aquí -->
-          <div class="carousel-wrapper" id="carousel-wrapper" style="display:none;">
-            <div class="carousel-track" id="carousel-track">
-              <!-- Imágenes dinámicas -->
+          <div class="reservas-form">
+            <div class="form-container">
+              <h3>📅 Agenda Online</h3>
+              <form id="form-reserva">
+                <div class="form-group">
+                  <label for="nombre">👤 Nombre Completo</label>
+                  <input type="text" id="nombre" placeholder="Ingresa tu nombre completo" required>
+                </div>
+                
+                <div class="form-group">
+                  <label for="telefono">📱 Teléfono</label>
+                  <input type="tel" id="telefono" placeholder="+56 9 XXXX XXXX" required>
+                </div>
+                
+                <div class="form-group">
+                  <label for="fecha-reserva">📅 Fecha Deseada</label>
+                  <input type="date" id="fecha-reserva" required onchange="mostrarHorasDisponibles()">
+                </div>
+                
+                <!-- Container para mostrar las horas disponibles -->
+                <div id="horas-disponibles-container" class="horas-container" style="display:none;">
+                  <label>🕐 Horario Disponible</label>
+                  <div id="horas-disponibles-grid" class="horas-grid">
+                    <!-- Las horas se mostrarán aquí dinámicamente -->
+                  </div>
+                  <input type="hidden" id="hora-seleccionada" required>
+                </div>
+                
+                <button type="submit" id="btn-reservar" class="btn-reservar" disabled>
+                  ✂️ Confirmar Reserva
+                </button>
+              </form>
+              
+              <div class="whatsapp-option">
+                <div class="divider">
+                  <span>o</span>
+                </div>
+                <a class="whatsapp-button" id="wa-btn" href="https://wa.me/56996774738" target="_blank" rel="noopener">
+                  📱 Agendar por WhatsApp
+                </a>
+                <p class="whatsapp-texto">Contacto directo con Daniel para una atención personalizada</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section id="contacto" class="contacto">
+      <div class="container">
+        <h2>Contacto y Ubicación</h2>
+        <p class="contacto-intro">Encuéntranos fácilmente y mantente conectado con nosotros</p>
+        
+        <div class="contacto-content">
+          <div class="contacto-info">
+            <div class="info-card">
+              <h3>📱 Redes Sociales</h3>
+              <div class="social-links">
+                <a href="https://www.instagram.com/estudio.danielmerquiz?igsh=MWxvMWs4emtld3dpaQ==" target="_blank" rel="noopener" class="social-link instagram">
+                  <span class="social-icon">📸</span>
+                  <div class="social-info">
+                    <strong>Instagram</strong>
+                    <span>@estudio.danielmerquiz</span>
+                  </div>
+                </a>
+                <a href="https://wa.me/56996774738" target="_blank" rel="noopener" class="social-link whatsapp">
+                  <span class="social-icon">💬</span>
+                  <div class="social-info">
+                    <strong>WhatsApp</strong>
+                    <span>+56 9 9677 4738</span>
+                  </div>
+                </a>
+              </div>
             </div>
             
-            <!-- Controles del carrusel -->
-            <button class="carousel-control prev" id="carousel-prev" onclick="moveCarousel(-1)">
-              <span>‹</span>
-            </button>
-            <button class="carousel-control next" id="carousel-next" onclick="moveCarousel(1)">
-              <span>›</span>
-            </button>
+            <div class="info-card">
+              <h3>⏰ Información de Contacto</h3>
+              <div class="contact-details-grid">
+                <div class="contact-item">
+                  <span class="contact-icon">🕐</span>
+                  <div>
+                    <strong>Horarios</strong>
+                    <p>Lun-Vie: 09:00-19:00<br>Sáb: 09:00-18:00<br>Dom: 10:00-16:00</p>
+                  </div>
+                </div>
+                <div class="contact-item">
+                  <span class="contact-icon">📞</span>
+                  <div>
+                    <strong>Teléfono</strong>
+                    <p>+56 9 9677 4738</p>
+                  </div>
+                </div>
+                <div class="contact-item">
+                  <span class="contact-icon">✂️</span>
+                  <div>
+                    <strong>Servicios</strong>
+                    <p>Cortes, afeitados, diseños y tratamientos</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="ubicaciones-section">
+            <h3>📍 Nuestras Ubicaciones</h3>
             
-            <!-- Indicadores -->
-            <div class="carousel-indicators" id="carousel-indicators">
-              <!-- Puntos indicadores se generan dinámicamente -->
+            <div class="locations-grid">
+              <!-- Primera ubicación - El Carmen -->
+              <div class="location-card">
+                <div class="location-header">
+                  <h4>🏪 Estudio El Carmen</h4>
+                  <span class="ubicacion-badge principal">Principal</span>
+                </div>
+                <div class="location-details">
+                  <p><strong>📍 Dirección:</strong> Calle 16 de Julio #752</p>
+                  <p><strong>🚗 Acceso:</strong> Fácil estacionamiento disponible</p>
+                  <p><strong>🏢 Características:</strong> Moderno estudio equipado con tecnología de vanguardia</p>
+                </div>
+                
+                <div class="map-container">
+                  <iframe 
+                    src="https://www.google.com/maps/embed?pb=!4v1755521355102!6m8!1m7!1soDmV8t-2M72Xu6LA5mXOIA!2m2!1d-36.89990786801867!2d-72.00504877342019!3f268.65512!4f1.1345254984292978!5f0.7820865974627469"
+                    width="100%" 
+                    height="250" 
+                    style="border:0; border-radius: 8px;" 
+                    allowfullscreen="" 
+                    loading="lazy" 
+                    referrerpolicy="no-referrer-when-downgrade">
+                  </iframe>
+                </div>
+                
+                <div class="location-actions">
+                  <a href="https://maps.google.com/?q=Calle+16+de+Julio+752+El+Carmen" target="_blank" class="btn-ubicacion">
+                    🗺️ Ver en Maps
+                  </a>
+                </div>
+              </div>
+
+              <!-- Segunda ubicación - Chillán -->
+              <div class="location-card">
+                <div class="location-header">
+                  <h4>🏪 Estudio Chillán</h4>
+                  <span class="ubicacion-badge">Sucursal</span>
+                </div>
+                <div class="location-details">
+                  <p><strong>📍 Dirección:</strong> Volcán Lascar #1274</p>
+                  <p><strong>🚗 Acceso:</strong> Zona comercial céntrica</p>
+                  <p><strong>🏢 Características:</strong> Mismo estándar de calidad y atención personalizada</p>
+                </div>
+                
+                <div class="map-container">
+                  <iframe 
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d800.5587188739297!2d-72.08288393046764!3d-36.62073262189544!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x966929c5f85ae385%3A0xc5a55d8eb678e71!2zVm9sY8OhbiBMYXNjYXIgMTI3NCwgMzgxMTQyNyBDaGlsbMOhbiwgw5F1Ymxl!5e0!3m2!1ses-419!2scl!4v1754944589868!5m2!1ses-419!2scl"
+                    width="100%" 
+                    height="250" 
+                    style="border:0; border-radius: 8px;" 
+                    allowfullscreen="" 
+                    loading="lazy" 
+                    referrerpolicy="no-referrer-when-downgrade">
+                  </iframe>
+                </div>
+                
+                <div class="location-actions">
+                  <a href="https://maps.google.com/?q=Volcán+Lascar+1274+Chillán" target="_blank" class="btn-ubicacion">
+                    🗺️ Ver en Maps
+                  </a>
+                </div>
+              </div>
+            </div>
+            
+            <div class="contacto-final">
+              <div class="contacto-cta">
+                <h4>💬 ¿Listo para tu nueva imagen?</h4>
+                <p>Contáctanos directamente por WhatsApp para agendar tu cita o resolver cualquier consulta</p>
+                <a href="https://wa.me/56996774738?text=Hola,%20me%20gustar%C3%ADa%20agendar%20una%20cita" target="_blank" class="btn-whatsapp-final">
+                  🚀 Conversar por WhatsApp
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section id="galeria" class="galeria">
+      <div class="container">
+        <h2>Galería de Trabajos</h2>
+        <p class="galeria-intro">Descubre nuestros mejores cortes, estilos y transformaciones</p>
+        
+        <div class="galeria-content">
+          <div class="galeria-info">
+            <div class="galeria-stats">
+              <div class="stat-card">
+                <div class="stat-number">500+</div>
+                <div class="stat-label">Clientes Satisfechos</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-number">10+</div>
+                <div class="stat-label">Años de Experiencia</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-number">15+</div>
+                <div class="stat-label">Estilos Diferentes</div>
+              </div>
+            </div>
+            
+            <div class="galeria-categorias">
+              <h3>🎨 Nuestras Especialidades</h3>
+              <div class="categorias-grid">
+                <div class="categoria-item">
+                  <span class="categoria-icon">✂️</span>
+                  <div>
+                    <h4>Cortes Clásicos</h4>
+                    <p>Estilos atemporales y elegantes</p>
+                  </div>
+                </div>
+                <div class="categoria-item">
+                  <span class="categoria-icon">🎨</span>
+                  <div>
+                    <h4>Diseños Modernos</h4>
+                    <p>Degradados y líneas personalizadas</p>
+                  </div>
+                </div>
+                <div class="categoria-item">
+                  <span class="categoria-icon">🪒</span>
+                  <div>
+                    <h4>Afeitados Premium</h4>
+                    <p>Técnicas tradicionales de barbería</p>
+                  </div>
+                </div>
+                <div class="categoria-item">
+                  <span class="categoria-icon">🧔</span>
+                  <div>
+                    <h4>Estilizado de Barba</h4>
+                    <p>Perfilado y mantenimiento profesional</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="galeria-cta">
+              <h4>📸 ¿Te gustó algún estilo?</h4>
+              <p>Muéstranos la foto de tu corte favorito y lo replicaremos perfectamente</p>
+              <a href="https://wa.me/56996774738?text=Hola,%20vi%20un%20corte%20en%20su%20galería%20que%20me%20gustó" target="_blank" class="btn-inspiracion">
+                💡 Enviar Inspiración
+              </a>
+            </div>
+          </div>
+          
+          <div class="galeria-carousel-section">
+            <h3>📷 Trabajos Destacados</h3>
+            
+            <!-- Carrusel de imágenes -->
+            <div class="gallery-carousel-container">
+              <div class="gallery-carousel" id="gallery-carousel">
+                <div class="no-gallery-images" id="no-gallery-images">
+                  <div class="no-images-message">
+                    <span class="gallery-icon">📷</span>
+                    <h4>Galería en construcción</h4>
+                    <p>Estamos preparando una increíble colección de nuestros mejores trabajos.</p>
+                    
+                    <div class="coming-soon-features">
+                      <div class="feature-preview">
+                        <span>🎯</span>
+                        <span>Antes y después</span>
+                      </div>
+                      <div class="feature-preview">
+                        <span>⭐</span>
+                        <span>Trabajos destacados</span>
+                      </div>
+                      <div class="feature-preview">
+                        <span>🎨</span>
+                        <span>Diferentes estilos</span>
+                      </div>
+                      <div class="feature-preview">
+                        <span>💡</span>
+                        <span>Ideas e inspiración</span>
+                      </div>
+                    </div>
+                    
+                    <div class="temp-gallery-actions">
+                      <p><strong>Mientras tanto:</strong></p>
+                      <a href="https://www.instagram.com/estudio.danielmerquiz?igsh=MWxvMWs4emtld3dpaQ==" target="_blank" class="btn-instagram">
+                        📸 Ver Instagram
+                      </a>
+                      <span class="gallery-divider">o</span>
+                      <a href="https://wa.me/56996774738?text=Hola,%20me%20gustar%C3%ADa%20ver%20ejemplos%20de%20trabajos" target="_blank" class="btn-trabajos">
+                        💬 Solicitar Ejemplos
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Las imágenes se cargarán dinámicamente aquí -->
+                <div class="carousel-wrapper" id="carousel-wrapper" style="display:none;">
+                  <div class="carousel-track" id="carousel-track">
+                    <!-- Imágenes dinámicas -->
+                  </div>
+                  
+                  <!-- Controles del carrusel -->
+                  <button class="carousel-control prev" id="carousel-prev" onclick="moveCarousel(-1)">
+                    <span>‹</span>
+                  </button>
+                  <button class="carousel-control next" id="carousel-next" onclick="moveCarousel(1)">
+                    <span>›</span>
+                  </button>
+                  
+                  <!-- Indicadores -->
+                  <div class="carousel-indicators" id="carousel-indicators">
+                    <!-- Puntos indicadores se generan dinámicamente -->
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="galeria-footer">
+              <div class="testimonial-preview">
+                <h4>💬 Lo que dicen nuestros clientes</h4>
+                <div class="testimonials">
+                  <blockquote>
+                    "Excelente atención y el mejor corte que me han hecho. Daniel es un verdadero artista."
+                    <cite>- Cliente satisfecho</cite>
+                  </blockquote>
+                  <blockquote>
+                    "El ambiente es súper profesional y el resultado siempre supera mis expectativas."
+                    <cite>- Cliente frecuente</cite>
+                  </blockquote>
+                </div>
+              </div>
             </div>
           </div>
         </div>

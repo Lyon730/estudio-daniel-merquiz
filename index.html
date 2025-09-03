@@ -249,25 +249,130 @@
       </div>
     </section>
     <section id="productos" class="productos">
-      <h2>Productos</h2>
-      <p>Descubre nuestra selección de productos profesionales para el cuidado del cabello</p>
-      
-      <div class="productos-carousel-container">
-        <button class="productos-carousel-controls prev" id="productos-prev" onclick="moveProductosCarousel(-1)">
-          <span>‹</span>
-        </button>
+      <div class="container">
+        <h2>Productos Profesionales</h2>
+        <p class="productos-intro">Descubre nuestra selección exclusiva de productos premium para el cuidado del cabello</p>
         
-        <div id="productos-grid" class="productos-grid">
-          <!-- Los productos se cargarán dinámicamente aquí -->
+        <div class="productos-content">
+          <div class="productos-info">
+            <div class="productos-destacados">
+              <h3>⭐ Productos Destacados</h3>
+              <div class="destacados-grid">
+                <div class="producto-destacado-card">
+                  <span class="producto-icon">💧</span>
+                  <div>
+                    <h4>Ceras y Pomadas</h4>
+                    <p>Fijación duradera para estilos clásicos y modernos</p>
+                  </div>
+                </div>
+                <div class="producto-destacado-card">
+                  <span class="producto-icon">✨</span>
+                  <div>
+                    <h4>Aceites Capilares</h4>
+                    <p>Nutrición profunda y brillo natural</p>
+                  </div>
+                </div>
+                <div class="producto-destacado-card">
+                  <span class="producto-icon">🧴</span>
+                  <div>
+                    <h4>Shampoos Premium</h4>
+                    <p>Limpieza suave con ingredientes naturales</p>
+                  </div>
+                </div>
+                <div class="producto-destacado-card">
+                  <span class="producto-icon">💨</span>
+                  <div>
+                    <h4>Sprays de Fijación</h4>
+                    <p>Control y volumen que dura todo el día</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="productos-beneficios">
+              <h4>🏆 ¿Por qué elegir nuestros productos?</h4>
+              <ul>
+                <li>✅ Marcas profesionales exclusivas</li>
+                <li>✅ Ingredientes de alta calidad</li>
+                <li>✅ Testados por barberos expertos</li>
+                <li>✅ Resultados duraderos</li>
+                <li>✅ Asesoría personalizada incluida</li>
+              </ul>
+            </div>
+            
+            <div class="productos-cta">
+              <h4>💡 ¿No sabes cuál elegir?</h4>
+              <p>Nuestros expertos te ayudan a encontrar el producto perfecto para tu tipo de cabello y estilo</p>
+              <a href="https://wa.me/56996774738?text=Hola,%20me%20gustar%C3%ADa%20asesor%C3%ADa%20sobre%20productos" target="_blank" class="btn-asesoria">
+                🎯 Solicitar Asesoría
+              </a>
+            </div>
+          </div>
+          
+          <div class="productos-showcase">
+            <h3>🛒 Catálogo de Productos</h3>
+            <p class="showcase-subtitle">Desliza para ver todos nuestros productos disponibles</p>
+            
+            <div class="productos-carousel-container">
+              <button class="productos-carousel-controls prev" id="productos-prev" onclick="moveProductosCarousel(-1)">
+                <span>‹</span>
+              </button>
+              
+              <div id="productos-grid" class="productos-grid">
+                <!-- Los productos se cargarán dinámicamente aquí -->
+              </div>
+              
+              <button class="productos-carousel-controls next" id="productos-next" onclick="moveProductosCarousel(1)">
+                <span>›</span>
+              </button>
+            </div>
+            
+            <div id="ver-mas-container" class="ver-mas-container" style="display: none;">
+              <button id="ver-mas-btn" class="ver-mas-btn" onclick="verMasProductos()">
+                📦 Ver Catálogo Completo
+              </button>
+            </div>
+            
+            <div class="productos-footer">
+              <div class="compra-info">
+                <div class="info-item">
+                  <span class="info-icon">🚚</span>
+                  <div>
+                    <strong>Retiro en Local</strong>
+                    <p>Disponible en ambas ubicaciones</p>
+                  </div>
+                </div>
+                <div class="info-item">
+                  <span class="info-icon">💳</span>
+                  <div>
+                    <strong>Múltiples Formas de Pago</strong>
+                    <p>Efectivo, tarjetas y transferencias</p>
+                  </div>
+                </div>
+                <div class="info-item">
+                  <span class="info-icon">🎁</span>
+                  <div>
+                    <strong>Promociones Especiales</strong>
+                    <p>Descuentos por cantidad y combos</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="productos-contacto">
+                <h4>🛍️ ¿Listo para comprar?</h4>
+                <p>Contacta directamente para consultar disponibilidad y coordinar tu compra</p>
+                <div class="contacto-botones">
+                  <a href="https://wa.me/56996774738?text=Hola,%20quiero%20comprar%20productos" target="_blank" class="btn-whatsapp-productos">
+                    💬 Comprar por WhatsApp
+                  </a>
+                  <a href="#contacto" class="btn-visitar-local">
+                    🏪 Visitar Local
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        
-        <button class="productos-carousel-controls next" id="productos-next" onclick="moveProductosCarousel(1)">
-          <span>›</span>
-        </button>
-      </div>
-      
-      <div id="ver-mas-container" class="ver-mas-container" style="display: none;">
-        <button id="ver-mas-btn" class="ver-mas-btn" onclick="verMasProductos()">Ver más productos</button>
       </div>
     </section>
     <section id="reservas" class="reservas">

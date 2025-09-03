@@ -2,12 +2,43 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Montserrat:wght@300;400;600;700&family=Dancing+Script:wght@400;500;600;700&family=Great+Vibes&family=Allura&display=swap');
 
 /* Paleta: negro (#1c1c1c), plomo (#2e2e2e), crema (#f5f5dc) */
-* { box-sizing: border-box; }
+* { 
+  box-sizing: border-box;
+}
+
+html {
+  overflow-x: hidden; /* Prevenir scroll horizontal global */
+  width: 100%;
+}
+
 body {
   font-family: 'Montserrat', Arial, Helvetica, sans-serif;
   background-color: #1c1c1c;
   color: #f5f5dc;
   margin: 0;
+  overflow-x: hidden; /* Prevenir scroll horizontal */
+  width: 100%;
+  position: relative;
+}
+
+/* ===== ESTILOS UNIVERSALES PARA PREVENIR OVERFLOW ===== */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+section {
+  overflow-x: hidden;
+  width: 100%;
+  position: relative;
+}
+
+/* Prevenir que elementos hijos se escapen del contenedor */
+* {
+  max-width: 100%;
 }
 
 /* ===== Hero con video ===== */
@@ -1631,8 +1662,9 @@ footer {
   padding: 4rem 0;
   background: linear-gradient(135deg, #1c1c1c 0%, #2e2e2e 100%);
   position: relative;
-  overflow: visible;
+  overflow-x: hidden; /* Prevenir overflow horizontal */
   min-height: 100vh;
+  width: 100%;
 }
 
 .productos::before {
@@ -1651,6 +1683,8 @@ footer {
   margin: 0 auto;
   padding: 0 20px;
   position: relative;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .productos h2 {
@@ -1838,6 +1872,7 @@ footer {
 .productos-carousel-container {
   position: relative;
   margin: 2rem 0;
+  padding: 0 60px; /* Espacio para los controles */
 }
 
 .productos-grid {
@@ -1849,6 +1884,7 @@ footer {
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  width: 100%;
 }
 
 .productos-grid::-webkit-scrollbar {
@@ -1880,11 +1916,11 @@ footer {
 }
 
 .productos-carousel-controls.prev {
-  left: -25px;
+  left: 5px;
 }
 
 .productos-carousel-controls.next {
-  right: -25px;
+  right: 5px;
 }
 
 .productos-carousel-controls span {
@@ -2125,6 +2161,11 @@ footer {
 @media (max-width: 768px) {
   .productos {
     padding: 3rem 0;
+    overflow-x: hidden;
+  }
+  
+  .productos .container {
+    padding: 0 15px;
   }
   
   .productos-content {
@@ -2140,22 +2181,25 @@ footer {
     grid-template-columns: 1fr;
   }
   
+  /* Carousel mobile optimizado */
+  .productos-carousel-container {
+    padding: 0 10px; /* Reducir padding en móvil */
+    margin: 1.5rem 0;
+  }
+  
   .productos-carousel-controls {
-    width: 40px;
-    height: 40px;
-    font-size: 1.2rem;
+    display: none; /* Ocultar controles en móvil para evitar overflow */
   }
   
-  .productos-carousel-controls.prev {
-    left: -20px;
-  }
-  
-  .productos-carousel-controls.next {
-    right: -20px;
+  .productos-grid {
+    padding: 1rem 0;
+    gap: 1rem;
+    -webkit-overflow-scrolling: touch;
   }
   
   .producto-card {
     min-width: 240px;
+    flex-shrink: 0;
   }
   
   .compra-info {
@@ -2174,6 +2218,10 @@ footer {
 }
 
 @media (max-width: 480px) {
+  .container {
+    padding: 0 10px;
+  }
+  
   .productos h2 {
     font-size: 2.5rem;
   }
@@ -2206,6 +2254,7 @@ footer {
   
   .producto-card {
     min-width: 200px;
+    max-width: calc(100vw - 40px);
   }
   
   .producto-imagen {
@@ -2223,6 +2272,25 @@ footer {
   .ver-mas-btn {
     padding: 0.8rem 2rem;
     font-size: 1rem;
+  }
+  
+  /* Galería responsive */
+  .galeria-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.8rem;
+  }
+  
+  .stat-card {
+    padding: 1rem 0.5rem;
+  }
+  
+  .coming-soon-features {
+    grid-template-columns: 1fr;
+  }
+  
+  .feature-preview {
+    padding: 0.6rem;
+    font-size: 0.85rem;
   }
 }
 }
@@ -3358,6 +3426,16 @@ footer {
 .galeria {
   padding: 4rem 0;
   background: linear-gradient(135deg, #2e2e2e 0%, #1c1c1c 100%);
+  overflow-x: hidden; /* Prevenir overflow horizontal */
+  width: 100%;
+}
+
+.galeria .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .galeria h2 {
@@ -3612,6 +3690,15 @@ footer {
     gap: 2rem;
   }
   
+  .galeria {
+    padding: 3rem 0;
+    overflow-x: hidden;
+  }
+  
+  .galeria .container {
+    padding: 0 15px;
+  }
+  
   .galeria-content {
     grid-template-columns: 1fr;
     gap: 2rem;
@@ -3626,17 +3713,21 @@ footer {
   }
   
   .coming-soon-features {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
   }
   
   .social-links {
     gap: 0.8rem;
+    flex-wrap: wrap;
+    justify-content: center;
   }
   
   .btn-instagram, .btn-trabajos {
     display: block;
-    margin: 0.5rem 0;
+    margin: 0.5rem auto;
     text-align: center;
+    max-width: 200px;
   }
   
   .gallery-divider {

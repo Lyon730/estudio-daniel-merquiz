@@ -76,22 +76,22 @@ body {
   margin: 0 0 2rem 0;
   padding: 0.5rem 0;
   color: #ffffff;
-  -webkit-text-stroke: 1px #acaaaa;
-  text-stroke: 1px #8d8c8c;
+  -webkit-text-stroke: 1px #666666;
+  text-stroke: 1px #666666;
   text-shadow: 
-    /* Contorno negro adicional */
+    /* Contorno negro */
     -1px -1px 0 #000000,
     1px -1px 0 #000000,
     -1px 1px 0 #000000,
     1px 1px 0 #000000,
-    /* Efectos de neón */
-    0 0 5px #00ffff,
-    0 0 10px #00ffff,
-    0 0 15px #00ffff,
-    0 0 20px #00ffff,
-    0 0 35px #00ffff,
-    0 0 40px #00ffff,
-    0 2px 0 #004d4d;
+    /* Efectos de neón gris/blanco */
+    0 0 5px #ffffff,
+    0 0 10px #ffffff,
+    0 0 15px #ffffff,
+    0 0 20px #e0e0e0,
+    0 0 35px #cccccc,
+    0 0 40px #bbbbbb,
+    0 2px 0 #333333;
   letter-spacing: 0.02em;
   text-transform: uppercase;
   line-height: 1.1;
@@ -123,27 +123,27 @@ body {
 /* Animación de parpadeo de neón con problemas eléctricos */
 @keyframes neonFlicker {
   0%, 18%, 22%, 25%, 53%, 57%, 100% {
-    color: #00ffff;
-    -webkit-text-stroke: 1px #000000;
+    color: #ffffff;
+    -webkit-text-stroke: 1px #666666;
     text-shadow: 
       /* Contorno negro */
       -1px -1px 0 #000000,
       1px -1px 0 #000000,
       -1px 1px 0 #000000,
       1px 1px 0 #000000,
-      /* Efectos de neón */
-      0 0 5px #00ffff,
-      0 0 10px #00ffff,
-      0 0 15px #00ffff,
-      0 0 20px #00ffff,
-      0 0 35px #00ffff,
-      0 0 40px #00ffff,
-      0 2px 0 #004d4d;
+      /* Efectos de neón gris/blanco */
+      0 0 5px #ffffff,
+      0 0 10px #ffffff,
+      0 0 15px #ffffff,
+      0 0 20px #e0e0e0,
+      0 0 35px #cccccc,
+      0 0 40px #bbbbbb,
+      0 2px 0 #333333;
   }
   
   19%, 21%, 23%, 24%, 54%, 56% {
-    color: #004d4d;
-    -webkit-text-stroke: 1px #000000;
+    color: #555555;
+    -webkit-text-stroke: 1px #333333;
     text-shadow: 
       /* Contorno negro mantenido */
       -1px -1px 0 #000000,
@@ -151,41 +151,41 @@ body {
       -1px 1px 0 #000000,
       1px 1px 0 #000000,
       /* Efectos apagados */
-      0 0 2px #004d4d,
-      0 2px 0 #001a1a;
+      0 0 2px #555555,
+      0 2px 0 #222222;
   }
   
   /* Parpadeos más rápidos para simular problemas eléctricos */
   26%, 27%, 28% {
-    color: #00cccc;
-    -webkit-text-stroke: 1px #000000;
+    color: #dddddd;
+    -webkit-text-stroke: 1px #555555;
     text-shadow: 
       /* Contorno negro */
       -1px -1px 0 #000000,
       1px -1px 0 #000000,
       -1px 1px 0 #000000,
       1px 1px 0 #000000,
-      /* Efectos de neón */
-      0 0 3px #00cccc,
-      0 0 8px #00cccc,
-      0 0 12px #00cccc,
-      0 2px 0 #003333;
+      /* Efectos de neón gris claro */
+      0 0 3px #dddddd,
+      0 0 8px #cccccc,
+      0 0 12px #bbbbbb,
+      0 2px 0 #444444;
   }
   
   58%, 59%, 60%, 61% {
-    color: #0080ff;
-    -webkit-text-stroke: 1px #000000;
+    color: #f0f0f0;
+    -webkit-text-stroke: 1px #666666;
     text-shadow: 
       /* Contorno negro */
       -1px -1px 0 #000000,
       1px -1px 0 #000000,
       -1px 1px 0 #000000,
       1px 1px 0 #000000,
-      /* Efectos de neón */
-      0 0 4px #0080ff,
-      0 0 9px #0080ff,
-      0 0 14px #0080ff,
-      0 2px 0 #002d66;
+      /* Efectos de neón blanco suave */
+      0 0 4px #f0f0f0,
+      0 0 9px #e0e0e0,
+      0 0 14px #d0d0d0,
+      0 2px 0 #404040;
   }
 }
 
@@ -319,22 +319,22 @@ body {
     margin-bottom: 1.5rem;
     line-height: 1.1;
     padding: 0.8rem 0;
-    color: #00ffff;
-    -webkit-text-stroke: 0.8px #000000;
+    color: #ffffff;
+    -webkit-text-stroke: 0.8px #666666;
     text-shadow: 
       /* Contorno negro para móvil */
       -1px -1px 0 #000000,
       1px -1px 0 #000000,
       -1px 1px 0 #000000,
       1px 1px 0 #000000,
-      /* Efectos de neón para móvil */
-      0 0 4px #00ffff,
-      0 0 8px #00ffff,
-      0 0 12px #00ffff,
-      0 0 16px #00ffff,
-      0 0 25px #00ffff,
-      0 0 30px #00ffff,
-      0 2px 0 #004d4d;
+      /* Efectos de neón gris/blanco para móvil */
+      0 0 4px #ffffff,
+      0 0 8px #ffffff,
+      0 0 12px #ffffff,
+      0 0 16px #e0e0e0,
+      0 0 25px #cccccc,
+      0 0 30px #bbbbbb,
+      0 2px 0 #333333;
     animation: neonFlicker 4s infinite;
   }
   

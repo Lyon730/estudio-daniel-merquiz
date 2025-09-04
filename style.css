@@ -1713,12 +1713,14 @@ footer {
 
 .productos-content {
   display: grid;
-  grid-template-columns: 1fr 2fr;
+  grid-template-columns: minmax(0,1fr) minmax(0,2fr);
   gap: 3rem;
   align-items: start;
   margin-bottom: 2rem;
   width: 100%;
+  max-width: 100vw;
   box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 /* Información de productos */
@@ -1889,7 +1891,8 @@ footer {
   scrollbar-width: none;
   -ms-overflow-style: none;
   width: 100%;
-  max-width: 100vw;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .productos-grid::-webkit-scrollbar {
@@ -1934,8 +1937,9 @@ footer {
 }
 
 .producto-card {
-  min-width: 240px;
-  max-width: 100%;
+  min-width: 0;
+  flex: 1 1 220px;
+  max-width: 320px;
   background: rgba(245, 245, 220, 0.05);
   border: 1px solid rgba(245, 245, 220, 0.1);
   border-radius: 15px;
@@ -1992,27 +1996,29 @@ footer {
   text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
 }
 
-.producto-info {
-  padding: 0;
-}
-
-.ver-mas-container {
-  text-align: center;
-  margin-top: 2rem;
-}
-
-.ver-mas-btn {
-  background: linear-gradient(135deg, #d4af37, #f4e678);
-  color: #1c1c1c;
-  border: none;
-  padding: 1rem 2.5rem;
-  border-radius: 50px;
-  cursor: pointer;
-  font-size: 1.1rem;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  .productos-content {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    width: 100%;
+    max-width: 100vw;
+    box-sizing: border-box;
+    overflow-x: hidden;
+  }
+  .productos-grid {
+    padding: 1rem 0;
+    gap: 1rem;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    max-width: 100vw;
+    box-sizing: border-box;
+    overflow-x: auto;
+  }
+  .producto-card {
+    min-width: 0;
+    flex: 1 1 180px;
+    max-width: 95vw;
+    box-sizing: border-box;
+  }
   box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
 }
 

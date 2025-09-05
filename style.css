@@ -1883,15 +1883,15 @@ footer {
 
 .productos-grid {
   display: flex;
-  gap: 1.5rem;
+  gap: 1.2rem;
   overflow-x: auto;
   scroll-behavior: smooth;
   padding: 1rem 0;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   -ms-overflow-style: none;
-  width: 100%;
-  max-width: 100%;
+  width: 100vw;
+  max-width: 100vw;
   box-sizing: border-box;
 }
 
@@ -1937,13 +1937,13 @@ footer {
 }
 
 .producto-card {
-  min-width: 0;
-  flex: 1 1 220px;
-  max-width: 320px;
+  min-width: 180px;
+  max-width: 95vw;
+  flex: 0 0 auto;
   background: rgba(245, 245, 220, 0.05);
   border: 1px solid rgba(245, 245, 220, 0.1);
   border-radius: 15px;
-  padding: 1.5rem;
+  padding: 1.2rem;
   text-align: center;
   transition: all 0.3s ease;
   backdrop-filter: blur(10px);
@@ -1988,20 +1988,20 @@ footer {
   text-overflow: ellipsis;
 }
 
-.producto-precio {
-  color: #d4af37;
-  font-size: 1.8rem;
-  font-weight: 700;
-  margin: 1rem 0;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-}
-
-  .productos-content {
-    grid-template-columns: 1fr;
-    gap: 2rem;
+  .productos-grid {
+    padding: 1rem 0;
+    gap: 0.8rem;
+    -webkit-overflow-scrolling: touch;
     width: 100vw;
     max-width: 100vw;
     box-sizing: border-box;
+  }
+  .producto-card {
+    min-width: 160px;
+    max-width: 92vw;
+    flex: 0 0 auto;
+    box-sizing: border-box;
+  }
     overflow-x: hidden;
     padding: 0;
   }
@@ -2023,8 +2023,9 @@ footer {
     box-sizing: border-box;
     margin-right: 1rem;
   }
-  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
-}
+  .producto-card {
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+  }
 
 .ver-mas-btn:hover {
   transform: translateY(-3px);
@@ -2315,7 +2316,6 @@ footer {
     padding: 0.6rem;
     font-size: 0.85rem;
   }
-}
 }
 
 /* ===== ESTILOS PARA PANEL ADMIN PRODUCTOS ===== */

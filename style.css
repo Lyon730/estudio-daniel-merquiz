@@ -1999,25 +1999,29 @@ footer {
   .productos-content {
     grid-template-columns: 1fr;
     gap: 2rem;
-    width: 100%;
+    width: 100vw;
     max-width: 100vw;
     box-sizing: border-box;
     overflow-x: hidden;
+    padding: 0;
   }
   .productos-grid {
     padding: 1rem 0;
     gap: 1rem;
     -webkit-overflow-scrolling: touch;
-    width: 100%;
+    width: 100vw;
     max-width: 100vw;
     box-sizing: border-box;
     overflow-x: auto;
+    display: flex;
+    flex-wrap: nowrap;
   }
   .producto-card {
-    min-width: 0;
-    flex: 1 1 180px;
-    max-width: 95vw;
+    min-width: 180px;
+    max-width: 90vw;
+    flex: 0 0 80vw;
     box-sizing: border-box;
+    margin-right: 1rem;
   }
   box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
 }

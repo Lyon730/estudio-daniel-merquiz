@@ -2,43 +2,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Montserrat:wght@300;400;600;700&family=Dancing+Script:wght@400;500;600;700&family=Great+Vibes&family=Allura&display=swap');
 
 /* Paleta: negro (#1c1c1c), plomo (#2e2e2e), crema (#f5f5dc) */
-* { 
-  box-sizing: border-box;
-}
-
-html {
-  overflow-x: hidden; /* Prevenir scroll horizontal global */
-  width: 100%;
-}
-
+* { box-sizing: border-box; }
 body {
   font-family: 'Montserrat', Arial, Helvetica, sans-serif;
   background-color: #1c1c1c;
   color: #f5f5dc;
   margin: 0;
-  overflow-x: hidden; /* Prevenir scroll horizontal */
-  width: 100%;
-  position: relative;
-}
-
-/* ===== ESTILOS UNIVERSALES PARA PREVENIR OVERFLOW ===== */
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-section {
-  overflow-x: hidden;
-  width: 100%;
-  position: relative;
-}
-
-/* Prevenir que elementos hijos se escapen del contenedor */
-* {
-  max-width: 100%;
 }
 
 /* ===== Hero con video ===== */
@@ -1662,10 +1631,8 @@ footer {
   padding: 4rem 0;
   background: linear-gradient(135deg, #1c1c1c 0%, #2e2e2e 100%);
   position: relative;
-  overflow-x: hidden; /* Prevenir overflow horizontal */
+  overflow: visible;
   min-height: 100vh;
-  width: 100vw;
-  max-width: 100vw;
 }
 
 .productos::before {
@@ -1684,9 +1651,6 @@ footer {
   margin: 0 auto;
   padding: 0 20px;
   position: relative;
-  width: 100%;
-  box-sizing: border-box;
-  overflow-x: hidden;
 }
 
 .productos h2 {
@@ -1713,14 +1677,10 @@ footer {
 
 .productos-content {
   display: grid;
-  grid-template-columns: minmax(0,1fr) minmax(0,2fr);
+  grid-template-columns: 1fr 2fr;
   gap: 3rem;
   align-items: start;
   margin-bottom: 2rem;
-  width: 100%;
-  max-width: 100vw;
-  box-sizing: border-box;
-  overflow-x: hidden;
 }
 
 /* Información de productos */
@@ -1878,22 +1838,17 @@ footer {
 .productos-carousel-container {
   position: relative;
   margin: 2rem 0;
-  padding: 0 60px; /* Espacio para los controles */
 }
 
 .productos-grid {
   display: flex;
-  gap: 1.2rem;
+  gap: 1.5rem;
   overflow-x: auto;
   scroll-behavior: smooth;
   padding: 1rem 0;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   -ms-overflow-style: none;
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  box-sizing: border-box;
 }
 
 .productos-grid::-webkit-scrollbar {
@@ -1925,11 +1880,11 @@ footer {
 }
 
 .productos-carousel-controls.prev {
-  left: 5px;
+  left: -25px;
 }
 
 .productos-carousel-controls.next {
-  right: 5px;
+  right: -25px;
 }
 
 .productos-carousel-controls span {
@@ -1938,9 +1893,7 @@ footer {
 }
 
 .producto-card {
-  min-width: 220px;
-  max-width: 320px;
-  flex: 1 1 220px;
+  min-width: 280px;
   background: rgba(245, 245, 220, 0.05);
   border: 1px solid rgba(245, 245, 220, 0.1);
   border-radius: 15px;
@@ -1949,7 +1902,6 @@ footer {
   transition: all 0.3s ease;
   backdrop-filter: blur(10px);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  box-sizing: border-box;
 }
 
 .producto-card:hover {
@@ -1989,41 +1941,37 @@ footer {
   text-overflow: ellipsis;
 }
 
-  .productos-grid {
-    padding: 1rem 0;
-    gap: 0.8rem;
-    -webkit-overflow-scrolling: touch;
-    width: 100vw;
-    max-width: 100vw;
-    box-sizing: border-box;
-  }
-  .producto-card {
-    min-width: 160px;
-    max-width: 92vw;
-    flex: 0 0 auto;
-    box-sizing: border-box;
-  /* Corrección: eliminadas llaves y propiedades sueltas que causaban errores de sintaxis. */
-  .productos-grid {
-    padding: 1rem 0;
-    gap: 1rem;
-    -webkit-overflow-scrolling: touch;
-    width: 100vw;
-    max-width: 100vw;
-    box-sizing: border-box;
-    overflow-x: auto;
-    display: flex;
-    flex-wrap: nowrap;
-  }
-  .producto-card {
-    min-width: 180px;
-    max-width: 90vw;
-    flex: 0 0 80vw;
-    box-sizing: border-box;
-    margin-right: 1rem;
-  }
-  .producto-card {
-    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
-  }
+.producto-precio {
+  color: #d4af37;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 1rem 0;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+.producto-info {
+  padding: 0;
+}
+
+.ver-mas-container {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.ver-mas-btn {
+  background: linear-gradient(135deg, #d4af37, #f4e678);
+  color: #1c1c1c;
+  border: none;
+  padding: 1rem 2.5rem;
+  border-radius: 50px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+}
 
 .ver-mas-btn:hover {
   transform: translateY(-3px);
@@ -2177,62 +2125,48 @@ footer {
 @media (max-width: 768px) {
   .productos {
     padding: 3rem 0;
-    overflow-x: hidden;
-    width: 100vw;
-    max-width: 100vw;
   }
-  .productos .container {
-    padding: 0 10px;
-    width: 100vw;
-    max-width: 100vw;
-    box-sizing: border-box;
-    overflow-x: hidden;
-  }
+  
   .productos-content {
     grid-template-columns: 1fr;
     gap: 2rem;
-    width: 100vw;
-    max-width: 100vw;
-    box-sizing: border-box;
   }
+  
   .productos-info, .productos-showcase {
-    padding: 1rem;
+    padding: 1.5rem;
   }
+  
   .destacados-grid {
     grid-template-columns: 1fr;
   }
-  .productos-carousel-container {
-    padding: 0 5px;
-    margin: 1rem 0;
-    width: 100vw;
-    max-width: 100vw;
-    box-sizing: border-box;
-    overflow-x: hidden;
-  }
+  
   .productos-carousel-controls {
-    display: none;
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
   }
-  .productos-grid {
-    padding: 1rem 0;
-    gap: 1rem;
-    -webkit-overflow-scrolling: touch;
-    width: 100vw;
-    max-width: 100vw;
-    box-sizing: border-box;
+  
+  .productos-carousel-controls.prev {
+    left: -20px;
   }
+  
+  .productos-carousel-controls.next {
+    right: -20px;
+  }
+  
   .producto-card {
-    min-width: 180px;
-    max-width: 90vw;
-    flex-shrink: 0;
-    box-sizing: border-box;
+    min-width: 240px;
   }
+  
   .compra-info {
     grid-template-columns: 1fr;
   }
+  
   .contacto-botones {
     flex-direction: column;
     align-items: center;
   }
+  
   .btn-whatsapp-productos, .btn-visitar-local {
     width: 100%;
     max-width: 280px;
@@ -2240,10 +2174,6 @@ footer {
 }
 
 @media (max-width: 480px) {
-  .container {
-    padding: 0 10px;
-  }
-  
   .productos h2 {
     font-size: 2.5rem;
   }
@@ -2276,7 +2206,6 @@ footer {
   
   .producto-card {
     min-width: 200px;
-    max-width: calc(100vw - 40px);
   }
   
   .producto-imagen {
@@ -2295,25 +2224,7 @@ footer {
     padding: 0.8rem 2rem;
     font-size: 1rem;
   }
-  
-  /* Galería responsive */
-  .galeria-stats {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.8rem;
-  }
-  
-  .stat-card {
-    padding: 1rem 0.5rem;
-  }
-  
-  .coming-soon-features {
-    grid-template-columns: 1fr;
-  }
-  
-  .feature-preview {
-    padding: 0.6rem;
-    font-size: 0.85rem;
-  }
+}
 }
 
 /* ===== ESTILOS PARA PANEL ADMIN PRODUCTOS ===== */
@@ -3447,18 +3358,6 @@ footer {
 .galeria {
   padding: 4rem 0;
   background: linear-gradient(135deg, #2e2e2e 0%, #1c1c1c 100%);
-  overflow-x: hidden; /* Prevenir overflow horizontal */
-  width: 100vw;
-  max-width: 100vw;
-}
-
-.galeria .container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-  width: 100%;
-  box-sizing: border-box;
-  overflow-x: hidden;
 }
 
 .galeria h2 {
@@ -3481,8 +3380,6 @@ footer {
   grid-template-columns: 1fr 2fr;
   gap: 3rem;
   align-items: start;
-  width: 100%;
-  box-sizing: border-box;
 }
 
 .galeria-stats {
@@ -3715,25 +3612,9 @@ footer {
     gap: 2rem;
   }
   
-  .galeria {
-    padding: 3rem 0;
-    overflow-x: hidden;
-    width: 100vw;
-    max-width: 100vw;
-  }
-  .galeria .container {
-    padding: 0 10px;
-    width: 100vw;
-    max-width: 100vw;
-    box-sizing: border-box;
-    overflow-x: hidden;
-  }
   .galeria-content {
     grid-template-columns: 1fr;
     gap: 2rem;
-    width: 100vw;
-    max-width: 100vw;
-    box-sizing: border-box;
   }
   
   .locations-grid {
@@ -3745,21 +3626,17 @@ footer {
   }
   
   .coming-soon-features {
-    grid-template-columns: 1fr;
-    gap: 0.8rem;
+    grid-template-columns: repeat(2, 1fr);
   }
   
   .social-links {
     gap: 0.8rem;
-    flex-wrap: wrap;
-    justify-content: center;
   }
   
   .btn-instagram, .btn-trabajos {
     display: block;
-    margin: 0.5rem auto;
+    margin: 0.5rem 0;
     text-align: center;
-    max-width: 200px;
   }
   
   .gallery-divider {

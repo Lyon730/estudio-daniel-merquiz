@@ -2002,10 +2002,7 @@ footer {
     max-width: 92vw;
     flex: 0 0 auto;
     box-sizing: border-box;
-  }
-    overflow-x: hidden;
-    padding: 0;
-  }
+  /* Corrección: eliminadas llaves y propiedades sueltas que causaban errores de sintaxis. */
   .productos-grid {
     padding: 1rem 0;
     gap: 1rem;

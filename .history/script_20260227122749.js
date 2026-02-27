@@ -170,8 +170,6 @@ function showAdminPanel() {
     // Esperar a que el panel se pinte (2 frames)
     await raf();
     await raf();
-    // Verificar estado Firebase automáticamente
-    diagnosticarFirebase();
     // Render inmediato del calendario (no bloquear por Firebase)
     console.log('🗓️ Render inmediato calendario (antes de datos)');
     inicializarCalendario();

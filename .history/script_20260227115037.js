@@ -280,11 +280,6 @@ function showAdminTab(tabName) {
       mostrarImagenesAdmin();
     }
   }
-  
-  // Si se selecciona la pestaña de servicios, renderizar
-  if (tabName === 'servicios-tab') {
-    renderServiciosAdmin();
-  }
 }
 
 // === VARIABLES GLOBALES (declaradas temprano para evitar TDZ) ===

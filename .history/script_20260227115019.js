@@ -280,11 +280,6 @@ function showAdminTab(tabName) {
       mostrarImagenesAdmin();
     }
   }
-  
-  // Si se selecciona la pestaña de servicios, renderizar
-  if (tabName === 'servicios-tab') {
-    renderServiciosAdmin();
-  }
 }
 
 // === VARIABLES GLOBALES (declaradas temprano para evitar TDZ) ===
@@ -1739,9 +1734,6 @@ document.addEventListener('DOMContentLoaded', async function() {
   
   // Inicializar productos
   initProductos();
-  
-  // Inicializar servicios
-  loadServicios();
   
   // Configurar fecha mínima para reservas
   const fechaInput = document.getElementById('fecha-reserva');

@@ -9,9 +9,9 @@
 
 ### 2. Obtener configuración
 En tu Dashboard de Cloudinary encontrarás:
-- **Cloud Name**: (ej: `dtwdfq2ht`)
-- **API Key**: (número largo)//336997674145327
-- **API Secret**: (para uso avanzado)//xEZshCZIPFo0shbsk55M9gxYIG4
+- **Cloud Name**: (ej: `mi_cloud_name`)
+- **API Key**: (número largo, solo necesario para operaciones del servidor)
+- **API Secret**: (solo necesario para operaciones del servidor, **nunca lo compartas**)
 
 ### 3. Crear Upload Preset
 1. Ve a **Settings** → **Upload**

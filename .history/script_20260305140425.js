@@ -156,11 +156,6 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 
 // Función para mostrar el panel de administración
 function showAdminPanel() {
-  // Mostrar email del usuario autenticado
-  const emailSpan = document.getElementById('admin-user-email');
-  if (emailSpan && firebase.auth && firebase.auth().currentUser) {
-    emailSpan.textContent = firebase.auth().currentUser.email;
-  }
   // Ocultar el contenido principal
   document.querySelector('header').style.display = 'none';
   document.querySelector('main').style.display = 'none';
